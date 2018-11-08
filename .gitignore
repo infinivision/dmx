@@ -2,6 +2,5 @@
 api/*idea*
 api/target
 api/*.DS*
-api/.mvn
 *.DS*
 
