@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/tag_meta/")
+@RequestMapping(value = "/tag_meta")
 
 public class TTagMetaController {
     @Autowired
     TTagMetaRepository tTagMetaRepository;
 
-    @GetMapping("{tag_id}")
+    @GetMapping("/{tag_id}")
     public GetMessageResponse<TTagMetaEntity> getTagMetaEntity(@PathVariable("tag_id") String tag_id) {
         Optional<TTagMetaEntity> item = tTagMetaRepository.findById(tag_id);
         if (item.isPresent()) {
@@ -58,7 +58,7 @@ public class TTagMetaController {
         return new MessageResponse(0, "");
     }
 
-    @PutMapping("{tag_id}")
+    @PutMapping("/{tag_id}")
     public MessageResponse updateTagMetaEntity(@PathVariable("tag_id") String tag_id, @RequestBody TTagMetaEntity tag_meta) {
         if (null == tag_id) {
             return new MessageResponse(-1, "id must not be null");
@@ -70,6 +70,7 @@ public class TTagMetaController {
         }
 
         try {
+            tag_meta.setUpdateTime(System.currentTimeMillis());
             tTagMetaRepository.save(item.get().merge(tag_meta));
         } catch (Exception e) {
             return new MessageResponse(-1, e.getMessage());
@@ -78,7 +79,7 @@ public class TTagMetaController {
         return new MessageResponse(0, "");
     }
 
-    @DeleteMapping("{tag_id}")
+    @DeleteMapping("/{tag_id}")
     public MessageResponse deleteTagMetaEntity(@PathVariable("tag_id") String tag_id) {
         if (null == tag_id) {
             return new MessageResponse(-1, "id must not be null");
@@ -98,7 +99,7 @@ public class TTagMetaController {
         return new MessageResponse(0, "");
     }
 
-    @GetMapping("list")
+    @GetMapping("/list")
     public GetListMessageResponse<TTagMetaEntity> getTTagMetaList(@RequestParam("page") Integer page,
                                                                   @RequestParam("size") Integer size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("updateTime"));
