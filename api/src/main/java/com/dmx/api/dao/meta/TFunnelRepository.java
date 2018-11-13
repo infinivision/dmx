@@ -1,6 +1,6 @@
-package com.dmx.api.dao;
+package com.dmx.api.dao.meta;
 
-import com.dmx.api.entity.TFunnelEntity;
+import com.dmx.api.entity.meta.TFunnelEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TFunnelRepository extends JpaRepository<TFunnelEntity, String> {

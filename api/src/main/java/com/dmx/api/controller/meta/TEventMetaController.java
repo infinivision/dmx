@@ -1,10 +1,10 @@
-package com.dmx.api.controller;
+package com.dmx.api.controller.meta;
 
 import com.dmx.api.bean.GetListMessageResponse;
 import com.dmx.api.bean.GetMessageResponse;
 import com.dmx.api.bean.MessageResponse;
-import com.dmx.api.dao.TEventMetaRepository;
-import com.dmx.api.entity.TEventMetaEntity;
+import com.dmx.api.dao.meta.TEventMetaRepository;
+import com.dmx.api.entity.meta.TEventMetaEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;

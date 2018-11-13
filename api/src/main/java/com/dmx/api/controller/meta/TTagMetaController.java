@@ -1,14 +1,10 @@
-package com.dmx.api.controller;
+package com.dmx.api.controller.meta;
 
 import com.dmx.api.bean.GetListMessageResponse;
 import com.dmx.api.bean.GetMessageResponse;
 import com.dmx.api.bean.MessageResponse;
-import com.dmx.api.dao.TTagMetaRepository;
-import com.dmx.api.entity.TTagMetaEntity;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import com.dmx.api.dao.meta.TTagMetaRepository;
+import com.dmx.api.entity.meta.TTagMetaEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController

@@ -1,10 +1,10 @@
-package com.dmx.api.controller;
+package com.dmx.api.controller.meta;
 
 import com.dmx.api.bean.GetListMessageResponse;
 import com.dmx.api.bean.GetMessageResponse;
 import com.dmx.api.bean.MessageResponse;
-import com.dmx.api.dao.TMlTaskRepository;
-import com.dmx.api.entity.TMlTaskEntity;
+import com.dmx.api.dao.meta.TMlTaskRepository;
+import com.dmx.api.entity.meta.TMlTaskEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

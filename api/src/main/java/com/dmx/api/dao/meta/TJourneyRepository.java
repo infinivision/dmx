@@ -1,6 +1,6 @@
-package com.dmx.api.dao;
+package com.dmx.api.dao.meta;
 
-import com.dmx.api.entity.TJourneyEntity;
+import com.dmx.api.entity.meta.TJourneyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TJourneyRepository extends JpaRepository<TJourneyEntity, String> {

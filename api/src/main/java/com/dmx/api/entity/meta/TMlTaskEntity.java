@@ -1,8 +1,7 @@
-package com.dmx.api.entity;
+package com.dmx.api.entity.meta;
 
 import javax.persistence.PrePersist;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 import java.util.UUID;
 
 @javax.persistence.Entity

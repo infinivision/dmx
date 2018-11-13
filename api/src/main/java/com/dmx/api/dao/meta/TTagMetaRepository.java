@@ -1,6 +1,6 @@
-package com.dmx.api.dao;
+package com.dmx.api.dao.meta;
 
-import com.dmx.api.entity.TTagMetaEntity;
+import com.dmx.api.entity.meta.TTagMetaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TTagMetaRepository extends JpaRepository<TTagMetaEntity, String>  {

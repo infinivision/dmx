@@ -1,18 +1,20 @@
-package com.dmx.api.entity;
+package com.dmx.api.entity.meta;
 
 import javax.persistence.PrePersist;
-import java.sql.Timestamp;
 import java.util.UUID;
 
 @javax.persistence.Entity
-@javax.persistence.Table(name = "t_funnel", schema = "db_dmx", catalog = "")
-public class TFunnelEntity {
+@javax.persistence.Table(name = "t_event_meta", schema = "db_dmx", catalog = "")
+public class TEventMetaEntity {
     private String id;
     private String name;
-    private Integer step;
-    private Integer customerCount;
-    private String eventName;
-    private Integer eventNameHash;
+    private Integer applicationId;
+    private String applicationName;
+    private Integer type;
+    private String objectId;
+    private Integer objectIdHash;
+    private String pageUrl;
+    private String pageHost;
     private String createUserName;
     private String createGroupName;
     private Integer platformId;
@@ -38,7 +40,7 @@ public class TFunnelEntity {
     }
 
     @javax.persistence.Basic
-    @javax.persistence.Column(name = "name", nullable = false, length = 255)
+    @javax.persistence.Column(name = "name", nullable = false, length = 512)
     public java.lang.String getName() {
         return name;
     }
@@ -48,43 +50,73 @@ public class TFunnelEntity {
     }
 
     @javax.persistence.Basic
-    @javax.persistence.Column(name = "step", nullable = false)
-    public Integer getStep() {
-        return step;
+    @javax.persistence.Column(name = "application_id", nullable = false)
+    public Integer getApplicationId() {
+        return applicationId;
     }
 
-    public void setStep(Integer step) {
-        this.step = step;
-    }
-
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "customer_count", nullable = false)
-    public Integer getCustomerCount() {
-        return customerCount;
-    }
-
-    public void setCustomerCount(Integer customerCount) {
-        this.customerCount = customerCount;
+    public void setApplicationId(Integer applicationId) {
+        this.applicationId = applicationId;
     }
 
     @javax.persistence.Basic
-    @javax.persistence.Column(name = "event_name", nullable = false, length = 255)
-    public java.lang.String getEventName() {
-        return eventName;
+    @javax.persistence.Column(name = "application_name", nullable = false, length = 255)
+    public java.lang.String getApplicationName() {
+        return applicationName;
     }
 
-    public void setEventName(java.lang.String eventName) {
-        this.eventName = eventName;
+    public void setApplicationName(java.lang.String applicationName) {
+        this.applicationName = applicationName;
     }
 
     @javax.persistence.Basic
-    @javax.persistence.Column(name = "event_name_hash", nullable = false)
-    public Integer getEventNameHash() {
-        return eventNameHash;
+    @javax.persistence.Column(name = "type", nullable = false)
+    public Integer getType() {
+        return type;
     }
 
-    public void setEventNameHash(Integer eventNameHash) {
-        this.eventNameHash = eventNameHash;
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    @javax.persistence.Basic
+    @javax.persistence.Column(name = "object_id", nullable = false, length = 512)
+    public java.lang.String getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(java.lang.String objectId) {
+        this.objectId = objectId;
+    }
+
+    @javax.persistence.Basic
+    @javax.persistence.Column(name = "object_id_hash", nullable = false)
+    public Integer getObjectIdHash() {
+        return objectIdHash;
+    }
+
+    public void setObjectIdHash(Integer objectIdHash) {
+        this.objectIdHash = objectIdHash;
+    }
+
+    @javax.persistence.Basic
+    @javax.persistence.Column(name = "page_url", nullable = false, length = 512)
+    public java.lang.String getPageUrl() {
+        return pageUrl;
+    }
+
+    public void setPageUrl(java.lang.String pageUrl) {
+        this.pageUrl = pageUrl;
+    }
+
+    @javax.persistence.Basic
+    @javax.persistence.Column(name = "page_host", nullable = false, length = 255)
+    public java.lang.String getPageHost() {
+        return pageHost;
+    }
+
+    public void setPageHost(java.lang.String pageHost) {
+        this.pageHost = pageHost;
     }
 
     @javax.persistence.Basic
@@ -153,15 +185,19 @@ public class TFunnelEntity {
         if (object == null || getClass() != object.getClass()) return false;
         if (!super.equals(object)) return false;
 
-        TFunnelEntity that = (TFunnelEntity) object;
+        TEventMetaEntity that = (TEventMetaEntity) object;
 
         if (id != that.id) return false;
-        if (step != that.step) return false;
-        if (customerCount != that.customerCount) return false;
-        if (eventNameHash != that.eventNameHash) return false;
+        if (applicationId != that.applicationId) return false;
+        if (type != that.type) return false;
+        if (objectIdHash != that.objectIdHash) return false;
         if (platformId != that.platformId) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (eventName != null ? !eventName.equals(that.eventName) : that.eventName != null) return false;
+        if (applicationName != null ? !applicationName.equals(that.applicationName) : that.applicationName != null)
+            return false;
+        if (objectId != null ? !objectId.equals(that.objectId) : that.objectId != null) return false;
+        if (pageUrl != null ? !pageUrl.equals(that.pageUrl) : that.pageUrl != null) return false;
+        if (pageHost != null ? !pageHost.equals(that.pageHost) : that.pageHost != null) return false;
         if (createUserName != null ? !createUserName.equals(that.createUserName) : that.createUserName != null)
             return false;
         if (createGroupName != null ? !createGroupName.equals(that.createGroupName) : that.createGroupName != null)
@@ -177,25 +213,31 @@ public class TFunnelEntity {
         int result = super.hashCode();
         result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + step;
-        result = 31 * result + customerCount;
-        result = 31 * result + (eventName != null ? eventName.hashCode() : 0);
-        result = 31 * result + eventNameHash;
-        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
-        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + applicationId;
+        result = 31 * result + (applicationName != null ? applicationName.hashCode() : 0);
+        result = 31 * result + (int) type;
+        result = 31 * result + (objectId != null ? objectId.hashCode() : 0);
+        result = 31 * result + objectIdHash;
+        result = 31 * result + (pageUrl != null ? pageUrl.hashCode() : 0);
+        result = 31 * result + (pageHost != null ? pageHost.hashCode() : 0);
         result = 31 * result + (createUserName != null ? createUserName.hashCode() : 0);
         result = 31 * result + (createGroupName != null ? createGroupName.hashCode() : 0);
         result = 31 * result + platformId;
         result = 31 * result + (platformName != null ? platformName.hashCode() : 0);
+        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         return result;
     }
 
-    public TFunnelEntity merge(TFunnelEntity o) {
+    public TEventMetaEntity merge(TEventMetaEntity o) {
         if (null != o.getName()) this.name = o.getName();
-        if (null != o.getStep()) this.step = o.getStep();
-        if (null != o.getEventName()) this.eventName = o.getEventName();
-        if (null != o.getEventNameHash()) this.eventNameHash = o.getEventNameHash();
-        if (null != o.getCustomerCount()) this.getCustomerCount();
+        if (null != o.getType()) this.type = o.getType();
+        if (0 < o.getApplicationId()) this.applicationId = o.getApplicationId();
+        if (null != o.getApplicationName()) this.applicationName = o.getApplicationName();
+        if (null != o.getObjectId()) this.objectId = o.getObjectId();
+        if (null != o.getObjectIdHash()) this.objectIdHash = o.getObjectIdHash();
+        if (null != o.getPageUrl()) this.pageUrl = o.getPageUrl();
+        if (null != o.getPageHost()) this.pageHost = o.getPageHost();
         if (null != o.getUpdateTime()) this.updateTime = o.getUpdateTime();
         if (null != o.getCreateTime()) this.createTime = o.getCreateTime();
         if (null != o.getCreateUserName()) this.createUserName = o.getCreateUserName();

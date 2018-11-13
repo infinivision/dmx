@@ -1,8 +1,7 @@
-package com.dmx.api.entity;
+package com.dmx.api.entity.meta;
 
 import javax.persistence.PrePersist;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 import java.util.UUID;
 
 @javax.persistence.Entity
@@ -21,6 +20,7 @@ public class TTagMetaEntity {
     private String categoryTree;
     @NotNull(message = "rules must not be null")
     private String rules;
+    private Long customerCount;
     private String description;
     private Long updateTime;
     private Long createTime;
@@ -114,6 +114,16 @@ public class TTagMetaEntity {
 
     public void setRules(java.lang.String rules) {
         this.rules = rules;
+    }
+
+    @javax.persistence.Basic
+    @javax.persistence.Column(name = "customer_count", nullable = false)
+    public Long getCustomerCount() {
+        return customerCount;
+    }
+
+    public void setCustomerCount(Long customerCount) {
+        this.customerCount = customerCount;
     }
 
     @javax.persistence.Basic
