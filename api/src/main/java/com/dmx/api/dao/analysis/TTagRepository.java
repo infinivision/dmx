@@ -14,7 +14,7 @@ public interface TTagRepository extends JpaRepository<TTagEntity, String> {
     @Query(value = "SELECT RB_CARDINALITY(id_list) FROM t_tag where id in (:id)",nativeQuery = true)
     Long getTagCustomerCountById(@Param("id") String id);
 
-    @Query(value = "SELECT RB_CARDINALITY(RB_OR_AGG(id_list)) FROM t_tag where id in (:ids)",nativeQuery = true)
+    @Query(value = "SELECT RB_OR_CARDINALITY_AGG(id_list) FROM t_tag where id in (:ids)",nativeQuery = true)
     Long getTagCustomerCountByIds(@Param("ids") List<String> ids);
 
     @Query(value = "SELECT RB_ITERATE(id_list) AS customer_id FROM t_tag where id in (:id)",
@@ -23,7 +23,7 @@ public interface TTagRepository extends JpaRepository<TTagEntity, String> {
     Page<BigInteger> getTagCustomerIdsByTagId(@Param("id") String id, Pageable pageable);
 
     @Query(value = "select distinct RB_ITERATE((SELECT RB_OR_AGG(id_list) FROM t_tag where id in (:ids))) as customer_id from t_tag",
-            countQuery = "SELECT RB_CARDINALITY(RB_OR_AGG(id_list)) FROM t_tag where t_tag.id in (:ids)",
+            countQuery = "SELECT RB_OR_CARDINALITY_AGG(id_list) FROM t_tag where t_tag.id in (:ids)",
             nativeQuery = true)
     Page<BigInteger> getTagCustomerIdsByTagIds(@Param("ids") List<String> ids, Pageable pageable);
 }

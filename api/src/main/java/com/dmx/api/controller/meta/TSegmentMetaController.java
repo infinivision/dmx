@@ -153,8 +153,11 @@ public class TSegmentMetaController {
 
     private List<String> getTagIdsBySegId(TSegmentMetaEntity segment) {
         List<String> result = new ArrayList<>();
-        result.add("f7fb65d1-4003-4ea7-9c89-68b8e71301b1");
-        result.add("fe4b2c35-a8ab-4155-8eda-e06674f527a3");
+        result.add("f7da55f2-50aa-435e-9852-8226fa1b1493");
+        result.add("e2fef9f7-f487-4751-859f-6af6a265dcd1");
+        result.add("c26d2450-4b0c-4f86-b6a4-9cb7e89fafe5");
+        result.add("ad77d687-e1ee-4c2f-8ed0-d78d2390cc0e");
+        result.add("ac4d68ff-446d-4316-81b0-94e485e3b020");
 
         return result;
     }
