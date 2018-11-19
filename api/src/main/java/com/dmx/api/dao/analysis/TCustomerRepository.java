@@ -5,8 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public interface TCustomerRepository extends JpaRepository<TCustomerEntity, String> {
-    Page<TCustomerEntity> findAllByIdIn(List<Integer> ids, Pageable pageable);
+    Page<TCustomerEntity> findByIdIn(List<Long> ids, Pageable pageable);
+    List<TCustomerEntity> findByIdInOrderById(List<Long> ids);
 }

@@ -3,7 +3,7 @@ package com.dmx.api.entity.analysis;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "t_customer", schema = "db_generate_entity", catalog = "")
+@Table(name = "t_customer", schema = "public", catalog = "db_dmx_stage")
 public class TCustomerEntity {
     private long id;
     private String name;
@@ -12,7 +12,7 @@ public class TCustomerEntity {
     private String gender;
     private short age;
     private String education;
-    private int birthday;
+    private String birthday;
     private String cardId;
     private int monthlySalary;
     private int yearSalary;
@@ -105,11 +105,11 @@ public class TCustomerEntity {
 
     @Basic
     @Column(name = "birthday", nullable = false)
-    public int getBirthday() {
+    public String getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(int birthday) {
+    public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
 
@@ -355,7 +355,7 @@ public class TCustomerEntity {
         result = 31 * result + (gender != null ? gender.hashCode() : 0);
         result = 31 * result + (int) age;
         result = 31 * result + (education != null ? education.hashCode() : 0);
-        result = 31 * result + birthday;
+        result = 31 * result + (birthday != null ? birthday.hashCode() : 0);
         result = 31 * result + (cardId != null ? cardId.hashCode() : 0);
         result = 31 * result + monthlySalary;
         result = 31 * result + yearSalary;

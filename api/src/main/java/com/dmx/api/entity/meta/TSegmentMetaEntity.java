@@ -1,22 +1,15 @@
 package com.dmx.api.entity.meta;
 
-import javax.persistence.PrePersist;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
-@javax.persistence.Entity
-@javax.persistence.Table(name = "t_tag_meta", schema = "db_dmx", catalog = "")
-public class TTagMetaEntity {
+@Entity
+@Table(name = "t_segment_meta", schema = "db_dmx", catalog = "")
+public class TSegmentMetaEntity {
     private String id;
     @NotNull(message = "name must not be null")
     private String name;
-    @NotNull(message = "type must not be null")
-    private short type;
-    @NotNull(message = "isStatic must not be null")
-    private byte isStatic;
-    @NotNull(message = "isSystem must not be null")
-    private byte isSystem;
-    @NotNull(message = "category must not be null")
     private String category;
     private String parentCategory;
     private String categoryTree;
@@ -31,16 +24,6 @@ public class TTagMetaEntity {
     private Integer platformId;
     private String platformName;
 
-    @javax.persistence.Id
-    @javax.persistence.Column(name = "id", nullable = false, length = 64)
-    public java.lang.String getId() {
-        return id;
-    }
-
-    public void setId(java.lang.String id) {
-        this.id = id;
-    }
-
     @PrePersist
     public void uuid() {
         this.id = UUID.randomUUID().toString().toUpperCase();
@@ -48,89 +31,68 @@ public class TTagMetaEntity {
         this.createTime = System.currentTimeMillis();
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "name", nullable = false, length = 64)
-    public java.lang.String getName() {
+    @Id
+    @Column(name = "id", nullable = false, length = 64)
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Basic
+    @Column(name = "name", nullable = false, length = 64)
+    public String getName() {
         return name;
     }
 
-    public void setName(java.lang.String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "type", nullable = false)
-    public short getType() {
-        return type;
-    }
-
-    public void setType(short type) {
-        this.type = type;
-    }
-
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "is_static", nullable = false)
-    public byte getIsStatic() {
-        return isStatic;
-    }
-
-    public void setIsStatic(byte isStatic) {
-        this.isStatic = isStatic;
-    }
-
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "is_system", nullable = false)
-    public byte getIsSystem() {
-        return isSystem;
-    }
-
-    public void setIsSystem(byte isSystem) {
-        this.isSystem = isSystem;
-    }
-
-
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "category", nullable = false, length = 512)
-    public java.lang.String getCategory() {
+    @Basic
+    @Column(name = "category", nullable = false, length = 512)
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(java.lang.String category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "parent_category", nullable = false, length = 512)
-    public java.lang.String getParentCategory() {
+    @Basic
+    @Column(name = "parent_category", nullable = false, length = 512)
+    public String getParentCategory() {
         return parentCategory;
     }
 
-    public void setParentCategory(java.lang.String parentCategory) {
+    public void setParentCategory(String parentCategory) {
         this.parentCategory = parentCategory;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "category_tree", nullable = false, length = 8096)
-    public java.lang.String getCategoryTree() {
+    @Basic
+    @Column(name = "category_tree", nullable = false, length = 8096)
+    public String getCategoryTree() {
         return categoryTree;
     }
 
-    public void setCategoryTree(java.lang.String categoryTree) {
+    public void setCategoryTree(String categoryTree) {
         this.categoryTree = categoryTree;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "rules", nullable = false, length = 8096)
-    public java.lang.String getRules() {
+    @Basic
+    @Column(name = "rules", nullable = false, length = 8096)
+    public String getRules() {
         return rules;
     }
 
-    public void setRules(java.lang.String rules) {
+    public void setRules(String rules) {
         this.rules = rules;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "customer_count", nullable = false)
+    @Basic
+    @Column(name = "customer_count", nullable = false)
     public Long getCustomerCount() {
         return customerCount;
     }
@@ -139,18 +101,18 @@ public class TTagMetaEntity {
         this.customerCount = customerCount;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "description", nullable = false, length = 1024)
-    public java.lang.String getDescription() {
+    @Basic
+    @Column(name = "description", nullable = false, length = 1024)
+    public String getDescription() {
         return description;
     }
 
-    public void setDescription(java.lang.String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "update_time", nullable = false)
+    @Basic
+    @Column(name = "update_time", nullable = false)
     public Long getUpdateTime() {
         return updateTime;
     }
@@ -159,8 +121,8 @@ public class TTagMetaEntity {
         this.updateTime = updateTime;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "create_time", nullable = false)
+    @Basic
+    @Column(name = "create_time", nullable = false)
     public Long getCreateTime() {
         return createTime;
     }
@@ -169,28 +131,28 @@ public class TTagMetaEntity {
         this.createTime = createTime;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "create_user_name", nullable = false, length = 255)
-    public java.lang.String getCreateUserName() {
+    @Basic
+    @Column(name = "create_user_name", nullable = false, length = 255)
+    public String getCreateUserName() {
         return createUserName;
     }
 
-    public void setCreateUserName(java.lang.String createUserName) {
+    public void setCreateUserName(String createUserName) {
         this.createUserName = createUserName;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "create_group_name", nullable = false, length = 255)
-    public java.lang.String getCreateGroupName() {
+    @Basic
+    @Column(name = "create_group_name", nullable = false, length = 255)
+    public String getCreateGroupName() {
         return createGroupName;
     }
 
-    public void setCreateGroupName(java.lang.String createGroupName) {
+    public void setCreateGroupName(String createGroupName) {
         this.createGroupName = createGroupName;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "platform_id", nullable = false)
+    @Basic
+    @Column(name = "platform_id", nullable = false)
     public Integer getPlatformId() {
         return platformId;
     }
@@ -199,26 +161,26 @@ public class TTagMetaEntity {
         this.platformId = platformId;
     }
 
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "platform_name", nullable = false, length = 255)
-    public java.lang.String getPlatformName() {
+    @Basic
+    @Column(name = "platform_name", nullable = false, length = 255)
+    public String getPlatformName() {
         return platformName;
     }
 
-    public void setPlatformName(java.lang.String platformName) {
+    public void setPlatformName(String platformName) {
         this.platformName = platformName;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        if (!super.equals(object)) return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        TTagMetaEntity that = (TTagMetaEntity) object;
+        TSegmentMetaEntity that = (TSegmentMetaEntity) o;
 
-        if (type != that.type) return false;
-        if (isStatic != that.isStatic) return false;
-        if (isSystem != that.isSystem) return false;
+        if (customerCount != that.customerCount) return false;
+        if (updateTime != that.updateTime) return false;
+        if (createTime != that.createTime) return false;
         if (platformId != that.platformId) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
@@ -228,8 +190,6 @@ public class TTagMetaEntity {
         if (categoryTree != null ? !categoryTree.equals(that.categoryTree) : that.categoryTree != null) return false;
         if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null) return false;
-        if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
         if (createUserName != null ? !createUserName.equals(that.createUserName) : that.createUserName != null)
             return false;
         if (createGroupName != null ? !createGroupName.equals(that.createGroupName) : that.createGroupName != null)
@@ -239,20 +199,18 @@ public class TTagMetaEntity {
         return true;
     }
 
+    @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (id != null ? id.hashCode() : 0);
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (int) type;
-        result = 31 * result + (int) isStatic;
-        result = 31 * result + (int) isSystem;
         result = 31 * result + (category != null ? category.hashCode() : 0);
         result = 31 * result + (parentCategory != null ? parentCategory.hashCode() : 0);
         result = 31 * result + (categoryTree != null ? categoryTree.hashCode() : 0);
         result = 31 * result + (rules != null ? rules.hashCode() : 0);
+        result = 31 * result + (int) (customerCount ^ (customerCount >>> 32));
         result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
-        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (int) (updateTime ^ (updateTime >>> 32));
+        result = 31 * result + (int) (createTime ^ (createTime >>> 32));
         result = 31 * result + (createUserName != null ? createUserName.hashCode() : 0);
         result = 31 * result + (createGroupName != null ? createGroupName.hashCode() : 0);
         result = 31 * result + platformId;
@@ -260,11 +218,8 @@ public class TTagMetaEntity {
         return result;
     }
 
-    public TTagMetaEntity merge(TTagMetaEntity o) {
+    public TSegmentMetaEntity merge(TSegmentMetaEntity o) {
         if (null != o.getName()) this.name = o.getName();
-        if (0 < o.getType()) this.type = o.getType();
-        if (0 < o.getIsStatic()) this.isStatic = o.getIsStatic();
-        if (0 < o.getIsSystem()) this.isSystem = o.getIsSystem();
         if (null != o.getCategory()) this.category = o.getCategory();
         if (null != o.getParentCategory()) this.parentCategory = o.getParentCategory();
         if (null != o.getRules()) this.rules = o.getRules();

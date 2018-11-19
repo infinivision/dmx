@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
-@Table(name = "t_tag", schema = "public", catalog = "db_dmx")
+@Table(name = "t_tag", schema = "public", catalog = "db_dmx_stage")
 public class TTagEntity {
     private String id;
     private short type;
@@ -44,8 +44,8 @@ public class TTagEntity {
         this.type = type;
     }
 
-    @Basic
-    @Column(name = "id_list", nullable = false, length = 64)
+    //@Basic
+    //@Column(name = "id_list", nullable = false, length = 64)
     public String getIdList() {
         return idList;
     }

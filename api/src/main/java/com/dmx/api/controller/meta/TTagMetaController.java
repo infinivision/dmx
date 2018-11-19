@@ -3,7 +3,10 @@ package com.dmx.api.controller.meta;
 import com.dmx.api.bean.GetListMessageResponse;
 import com.dmx.api.bean.GetMessageResponse;
 import com.dmx.api.bean.MessageResponse;
+import com.dmx.api.dao.analysis.TCustomerRepository;
+import com.dmx.api.dao.analysis.TTagRepository;
 import com.dmx.api.dao.meta.TTagMetaRepository;
+import com.dmx.api.entity.analysis.TCustomerEntity;
 import com.dmx.api.entity.meta.TTagMetaEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,14 +17,23 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/tag_meta")
+@RequestMapping(value = "/tag")
 
 public class TTagMetaController {
     @Autowired
     TTagMetaRepository tTagMetaRepository;
+
+    @Autowired
+    TTagRepository tTagRepository;
+
+    @Autowired
+    TCustomerRepository tCustomerRepository;
 
     @GetMapping("/{tag_id}")
     public GetMessageResponse<TTagMetaEntity> getTagMetaEntity(@PathVariable("tag_id") String tag_id) {
@@ -102,5 +114,24 @@ public class TTagMetaController {
         Page<TTagMetaEntity> page_list = tTagMetaRepository.findAll(pageable);
 
         return new GetListMessageResponse<TTagMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
+    }
+
+    @GetMapping("/{tag_id}/customers")
+    public GetListMessageResponse<TCustomerEntity> GetCustomersByTagId(@PathVariable("tag_id") String tag_id,
+                                                                       @RequestParam("page") Integer page,
+                                                                       @RequestParam("size") Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("customer_id"));
+
+        Page<BigInteger> page_raw_customer_ids = tTagRepository.getTagCustomerIdsByTagId(tag_id, pageable);
+
+        int customer_size = page_raw_customer_ids.getContent().size();
+        List<Long> customer_ids = new ArrayList<>();
+        for (int i = 0 ; i < customer_size; ++i) {
+            customer_ids.add(page_raw_customer_ids.getContent().get(i).longValue());
+        }
+
+        List<TCustomerEntity> customers = tCustomerRepository.findByIdInOrderById(customer_ids);
+
+        return new GetListMessageResponse<TCustomerEntity>(0, "", page, size, page_raw_customer_ids.getTotalElements(), customers);
     }
 }
