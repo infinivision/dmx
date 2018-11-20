@@ -120,11 +120,20 @@ public class TTagMetaController {
     public GetListMessageResponse<TCustomerEntity> GetCustomersByTagId(@PathVariable("tag_id") String tag_id,
                                                                        @RequestParam("page") Integer page,
                                                                        @RequestParam("size") Integer size) {
+
+        Optional<TTagMetaEntity> item = tTagMetaRepository.findById(tag_id);
+        if (!item.isPresent()) {
+            return new GetListMessageResponse<TCustomerEntity>(-1, "tag id:" + tag_id + " is not exists", page, size, new Long(0), null);
+        }
+
         Pageable pageable = PageRequest.of(page, size, Sort.by("customer_id"));
 
         Page<BigInteger> page_raw_customer_ids = tTagRepository.getTagCustomerIdsByTagId(tag_id, pageable);
-
         int customer_size = page_raw_customer_ids.getContent().size();
+        if (0 >= customer_size) {
+            return new GetListMessageResponse<TCustomerEntity>(-1, "tag id:" + tag_id + " has no customers", page, size, new Long(0), null);
+        }
+
         List<Long> customer_ids = new ArrayList<>();
         for (int i = 0 ; i < customer_size; ++i) {
             customer_ids.add(page_raw_customer_ids.getContent().get(i).longValue());

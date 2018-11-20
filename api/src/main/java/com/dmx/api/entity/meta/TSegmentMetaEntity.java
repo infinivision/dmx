@@ -10,13 +10,13 @@ public class TSegmentMetaEntity {
     private String id;
     @NotNull(message = "name must not be null")
     private String name;
-    private String category;
-    private String parentCategory;
-    private String categoryTree;
+    private String category = "";
+    private String parentCategory = "";
+    private String categoryTree = "";
     @NotNull(message = "rules must not be null")
     private String rules;
-    private Long customerCount;
-    private String description;
+    private Long customerCount = new Long(0);
+    private String description = "";
     private Long updateTime;
     private Long createTime;
     private String createUserName;

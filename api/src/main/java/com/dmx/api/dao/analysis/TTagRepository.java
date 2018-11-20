@@ -4,8 +4,10 @@ import com.dmx.api.entity.analysis.TTagEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -26,4 +28,49 @@ public interface TTagRepository extends JpaRepository<TTagEntity, String> {
             countQuery = "SELECT RB_OR_CARDINALITY_AGG(id_list) FROM t_tag where t_tag.id in (:ids)",
             nativeQuery = true)
     Page<BigInteger> getTagCustomerIdsByTagIds(@Param("ids") List<String> ids, Pageable pageable);
+
+
+    @Query(value = "SELECT id AS tag_id FROM t_tag where id in (:ids) and update_time >= :updateTime", nativeQuery = true)
+    List<String> getIdByIdsAndUpdateTime(@Param("ids") List<String> ids, @Param("updateTime") Long updateTime);
+
+
+    @Transactional
+    @Modifying
+    @Query(value = "update t_tag set id_list=RB_AND(id_list, (select RB_AND_AGG(id_list) from t_tag where id in (:ids))),update_time=:now where id = :id", nativeQuery = true)
+    void updateTagLogicAndAnd(@Param("ids") List<String> ids, @Param("id") String id, @Param("now") Long now);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update t_tag set id_list=RB_AND(id_list, (select RB_OR_AGG(id_list) from t_tag where id in (:ids))),update_time=:now where id = :id", nativeQuery = true)
+    void updateTagLogicAndOr(@Param("ids") List<String> ids, @Param("id") String id, @Param("now") Long now);
+
+
+    @Transactional
+    @Modifying
+    @Query(value = "update t_tag set id_list=RB_OR(id_list, (select RB_OR_AGG(id_list) from t_tag where id in (:ids))),update_time=:now where id = :id", nativeQuery = true)
+    void updateTagLogicOrOr(@Param("ids") List<String> ids, @Param("id") String id, @Param("now") Long now);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update t_tag set id_list=RB_OR(id_list, (select RB_AND_AGG(id_list) from t_tag where id in (:ids))),update_time=:now where id = :id", nativeQuery = true)
+    void updateTagLogicOrAnd(@Param("ids") List<String> ids, @Param("id") String id, @Param("now") Long now);
+
+
+    @Transactional
+    @Modifying
+    @Query(value = "insert into t_tag (id, type, id_list, start_date, end_date, update_time, create_time, create_user_name, create_group_name, platform_id, platform_name)" +
+            " values (:id, 1, (select RB_OR_AGG(id_list) from t_tag where id in (:ids)), (select to_date(:cur_date, 'YYYY-MM-DD')), '2099-12-31', :now, :now, :create_user, :create_group, :platform_id, :platform_name)", nativeQuery = true)
+    void insertSegmentLogicAnd(@Param("ids") List<String> ids, @Param("id") String id, @Param("cur_date") String cur_date,
+                               @Param("now") Long now,
+                               @Param("create_user") String create_user, @Param("create_group") String create_group,
+                               @Param("platform_id") Integer platform_id, @Param("platform_name") String platform_name);
+
+    @Transactional
+    @Modifying
+    @Query(value = "insert into t_tag (id, type, id_list, start_date, end_date, update_time, create_time, create_user_name, create_group_name, platform_id, platform_name)" +
+            " values (:id, 1, (select RB_OR_AGG(id_list) from t_tag where id in (:ids)), (select to_date(:cur_date, 'YYYY-MM-DD')), '2099-12-31', :now, :now, :create_user, :create_group, :platform_id, :platform_name)", nativeQuery = true)
+    void insertSegmentLogicOr(@Param("ids") List<String> ids, @Param("id") String id, @Param("cur_date") String cur_date,
+                               @Param("now") Long now,
+                               @Param("create_user") String create_user, @Param("create_group") String create_group,
+                               @Param("platform_id") Integer platform_id, @Param("platform_name") String platform_name);
 }
