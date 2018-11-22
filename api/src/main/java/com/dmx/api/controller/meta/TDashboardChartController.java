@@ -44,11 +44,7 @@ public class TDashboardChartController {
             return new MessageResponse(-1, "name:" + chart.getName() + " is exists");
         }
 
-        try {
-            tDashboardChartRepository.save(chart);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tDashboardChartRepository.save(chart);
 
         return new MessageResponse(0, "");
     }
@@ -64,12 +60,8 @@ public class TDashboardChartController {
             return new MessageResponse(0, "id:" + dashboard_chart_id + " is not exists");
         }
 
-        try {
-            chart.setUpdateTime(System.currentTimeMillis());
-            tDashboardChartRepository.save(item.get().merge(chart));
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        chart.setUpdateTime(System.currentTimeMillis());
+        tDashboardChartRepository.save(item.get().merge(chart));
 
         return new MessageResponse(0, "");
     }
@@ -85,11 +77,7 @@ public class TDashboardChartController {
             return new MessageResponse(0, "id:" + dashboard_chart_id + " is not exists");
         }
 
-        try {
-            tDashboardChartRepository.deleteById(dashboard_chart_id);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tDashboardChartRepository.deleteById(dashboard_chart_id);
 
         return new MessageResponse(0, "");
     }

@@ -35,8 +35,8 @@ public class TEventMetaEntity {
     @PrePersist
     public void uuid() {
         this.id = UUID.randomUUID().toString().toUpperCase();
-        this.updateTime = System.currentTimeMillis();
-        this.createTime = System.currentTimeMillis();
+        this.updateTime = System.currentTimeMillis()/1000;
+        this.createTime = System.currentTimeMillis()/1000;
     }
 
     @javax.persistence.Basic
@@ -232,7 +232,7 @@ public class TEventMetaEntity {
     public TEventMetaEntity merge(TEventMetaEntity o) {
         if (null != o.getName()) this.name = o.getName();
         if (null != o.getType()) this.type = o.getType();
-        if (0 < o.getApplicationId()) this.applicationId = o.getApplicationId();
+        if (null != o.getApplicationId()) this.applicationId = o.getApplicationId();
         if (null != o.getApplicationName()) this.applicationName = o.getApplicationName();
         if (null != o.getObjectId()) this.objectId = o.getObjectId();
         if (null != o.getObjectIdHash()) this.objectIdHash = o.getObjectIdHash();

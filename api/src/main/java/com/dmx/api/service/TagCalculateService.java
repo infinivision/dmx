@@ -1,8 +1,8 @@
 package com.dmx.api.service;
 
 import com.dmx.api.dao.analysis.TTagRepository;
-import com.dmx.api.dao.meta.TSegmentMetaRepository;
-import com.dmx.api.entity.meta.TSegmentMetaEntity;
+import com.dmx.api.dao.meta.TTagMetaRepository;
+import com.dmx.api.entity.meta.TTagMetaEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class SegmentCalculateService {
+public class TagCalculateService {
     @Autowired
-    TSegmentMetaRepository tSegmentMetaRepository;
+    TTagMetaRepository tTagMetaRepository;
 
     @Autowired
     TTagRepository tTagRepository;
@@ -27,20 +27,20 @@ public class SegmentCalculateService {
     private Environment env;
 
     // one hour
-    @Scheduled(fixedRate = 3600000)
+    @Scheduled(fixedRate = 10000)
     public void CalculateSegments() {
-        Page<TSegmentMetaEntity> page_segment_list;
+        Page<TTagMetaEntity> page_tag_list;
 
         Integer page = 0;
-        Integer size = Integer.parseInt(env.getProperty("application.segment.size"));
+        Integer size = Integer.parseInt(env.getProperty("application.tag.size"));
         if (0 >= size) {
             size = 100;
         }
 
         do {
             Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
-            page_segment_list = tSegmentMetaRepository.findAll(pageable);
-            List<TSegmentMetaEntity> list = page_segment_list.getContent();
+            page_tag_list = tTagMetaRepository.findAll(pageable);
+            List<TTagMetaEntity> list = page_tag_list.getContent();
 
             List<String> ids = new ArrayList<>();
             for (int i = 0; i < list.size(); ++i) {
@@ -48,23 +48,25 @@ public class SegmentCalculateService {
             }
 
             List<Object[]> result_list = tTagRepository.getTagCountByIds(ids);
-            for (int i = 0, j = 0; i < result_list.size(); ++i) {
+            for (int i = 0,j = 0; (i < list.size()) && (j < result_list.size()); ++i) {
                 Object[] item = result_list.get(j);
+                TTagMetaEntity tag_meta = list.get(i);
 
                 String id = String.valueOf(item[0]);
                 String customer_count = String.valueOf(item[1]);
 
-                if (list.get(i).getId().equals(id)) {
-                    list.get(i).setCustomerCount(Long.parseLong(customer_count));
+                if (tag_meta.getId().equals(id)) {
+                    list.get(i).setUpdateTime(System.currentTimeMillis()/1000);
+                    list.get(i).setCount(Long.parseLong(customer_count));
                     ++j;
                 } else {
                     System.out.print(" ****************************** list id:" + list.get(i).getId() + " tag id:" + id + " \r\n");
                 }
             }
 
-            tSegmentMetaRepository.saveAll(list);
+            tTagMetaRepository.saveAll(list);
 
             ++page;
-        } while (page_segment_list.getContent().size() >= size);
+        } while (page_tag_list.getContent().size() >= size);
     }
 }

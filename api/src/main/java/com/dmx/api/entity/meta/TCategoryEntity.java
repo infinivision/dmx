@@ -5,15 +5,15 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
-@Table(name = "t_segment_meta", schema = "db_dmx", catalog = "")
-public class TSegmentMetaEntity {
+@Table(name = "t_category", schema = "db_dmx", catalog = "")
+public class TCategoryEntity {
     private String id;
+    private Integer type = 1;
     @NotNull(message = "name must not be null")
     private String name;
-    private String category = "";
-    @NotNull(message = "rules must not be null")
-    private String rules;
-    private Long customerCount = new Long(0);
+    private String parent = "";
+    private String categoryTree = "";
+    private Integer level = 0;
     private String description = "";
     private Long updateTime;
     private Long createTime;
@@ -40,7 +40,17 @@ public class TSegmentMetaEntity {
     }
 
     @Basic
-    @Column(name = "name", nullable = false, length = 64)
+    @Column(name = "type", nullable = false)
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    @Basic
+    @Column(name = "name", nullable = false, length = 512)
     public String getName() {
         return name;
     }
@@ -50,33 +60,33 @@ public class TSegmentMetaEntity {
     }
 
     @Basic
-    @Column(name = "category", nullable = false, length = 512)
-    public String getCategory() {
-        return category;
+    @Column(name = "parent", nullable = false, length = 64)
+    public String getParent() {
+        return parent;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    @Basic
-    @Column(name = "rules", nullable = false, length = 8096)
-    public String getRules() {
-        return rules;
-    }
-
-    public void setRules(String rules) {
-        this.rules = rules;
+    public void setParent(String parent) {
+        this.parent = parent;
     }
 
     @Basic
-    @Column(name = "customer_count", nullable = false)
-    public Long getCustomerCount() {
-        return customerCount;
+    @Column(name = "category_tree", nullable = false, length = 8096)
+    public String getCategoryTree() {
+        return categoryTree;
     }
 
-    public void setCustomerCount(Long customerCount) {
-        this.customerCount = customerCount;
+    public void setCategoryTree(String categoryTree) {
+        this.categoryTree = categoryTree;
+    }
+
+    @Basic
+    @Column(name = "level", nullable = false)
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     @Basic
@@ -95,7 +105,7 @@ public class TSegmentMetaEntity {
         return updateTime;
     }
 
-    public void setUpdateTime(Long updateTime) {
+    public void setUpdateTime(long updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -105,7 +115,7 @@ public class TSegmentMetaEntity {
         return createTime;
     }
 
-    public void setCreateTime(Long createTime) {
+    public void setCreateTime(long createTime) {
         this.createTime = createTime;
     }
 
@@ -135,7 +145,7 @@ public class TSegmentMetaEntity {
         return platformId;
     }
 
-    public void setPlatformId(Integer platformId) {
+    public void setPlatformId(int platformId) {
         this.platformId = platformId;
     }
 
@@ -154,16 +164,17 @@ public class TSegmentMetaEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TSegmentMetaEntity that = (TSegmentMetaEntity) o;
+        TCategoryEntity that = (TCategoryEntity) o;
 
-        if (customerCount != that.customerCount) return false;
+        if (type != that.type) return false;
+        if (level != that.level) return false;
         if (updateTime != that.updateTime) return false;
         if (createTime != that.createTime) return false;
         if (platformId != that.platformId) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (category != null ? !category.equals(that.category) : that.category != null) return false;
-        if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
+        if (parent != null ? !parent.equals(that.parent) : that.parent != null) return false;
+        if (categoryTree != null ? !categoryTree.equals(that.categoryTree) : that.categoryTree != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (createUserName != null ? !createUserName.equals(that.createUserName) : that.createUserName != null)
             return false;
@@ -177,10 +188,11 @@ public class TSegmentMetaEntity {
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + type;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (category != null ? category.hashCode() : 0);
-        result = 31 * result + (rules != null ? rules.hashCode() : 0);
-        result = 31 * result + (int) (customerCount ^ (customerCount >>> 32));
+        result = 31 * result + (parent != null ? parent.hashCode() : 0);
+        result = 31 * result + (categoryTree != null ? categoryTree.hashCode() : 0);
+        result = 31 * result + level;
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (int) (updateTime ^ (updateTime >>> 32));
         result = 31 * result + (int) (createTime ^ (createTime >>> 32));
@@ -191,10 +203,11 @@ public class TSegmentMetaEntity {
         return result;
     }
 
-    public TSegmentMetaEntity merge(TSegmentMetaEntity o) {
+    public TCategoryEntity merge(TCategoryEntity o) {
         if (null != o.getName()) this.name = o.getName();
-        if (null != o.getCategory()) this.category = o.getCategory();
-        if (null != o.getRules()) this.rules = o.getRules();
+        if (null != o.getType()) this.type = o.getType();
+        if (null != o.getLevel()) this.level = o.getLevel();
+        if (null != o.getParent()) this.parent = o.getParent();
         if (null != o.getDescription()) this.description = o.getDescription();
         if (null != o.getUpdateTime()) this.updateTime = o.getUpdateTime();
         if (null != o.getCreateTime()) this.createTime = o.getCreateTime();
@@ -206,4 +219,3 @@ public class TSegmentMetaEntity {
         return this;
     }
 }
-

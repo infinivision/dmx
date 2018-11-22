@@ -46,6 +46,7 @@ public class MetaDataSourceConfig {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto",
                 env.getProperty("spring.jpa.hibernate.ddl-auto"));
+        properties.put("hibernate.dialect", env.getProperty("spring.jpa.properties.hibernate.dialect"));
         em.setJpaPropertyMap(properties);
 
         return em;

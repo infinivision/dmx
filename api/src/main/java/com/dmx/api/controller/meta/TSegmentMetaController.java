@@ -7,6 +7,7 @@ import com.dmx.api.dao.analysis.TCustomerRepository;
 import com.dmx.api.dao.analysis.TTagRepository;
 import com.dmx.api.dao.meta.TSegmentMetaRepository;
 import com.dmx.api.entity.analysis.TCustomerEntity;
+import com.dmx.api.entity.analysis.TTagEntity;
 import com.dmx.api.entity.meta.TSegmentMetaEntity;
 import com.dmx.api.service.bean.SegmentRuleBean;
 import com.dmx.api.service.bean.SegmentRulesBean;
@@ -62,26 +63,22 @@ public class TSegmentMetaController {
             return new MessageResponse(-1, "name:" + segment_meta.getName() + " is exists");
         }
 
-        SegmentRulesBean rules_bean = null;
-
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            rules_bean = mapper.readValue(segment_meta.getRules() , SegmentRulesBean.class);
-
-        } catch (Exception e) {
-            return new MessageResponse(-1, "rules:" + segment_meta.getRules() + " is invalid");
-        }
-
         segment_meta.setCreateUserName("admin");
         segment_meta.setCreateGroupName("group");
         segment_meta.setPlatformId(1);
         segment_meta.setPlatformName("infinivision");
 
-        try {
-            tSegmentMetaRepository.save(segment_meta);
-            insertRules(segment_meta, rules_bean, System.currentTimeMillis());
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
+        tSegmentMetaRepository.save(segment_meta);
+
+        if (null != segment_meta.getRules() && 0 < segment_meta.getRules().length()) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                SegmentRulesBean rules_bean = mapper.readValue(segment_meta.getRules() , SegmentRulesBean.class);
+
+                insertRules(segment_meta, rules_bean, System.currentTimeMillis());
+            } catch (Exception e) {
+                return new MessageResponse(-1, "rules:" + segment_meta.getRules() + " is invalid");
+            }
         }
 
         return new MessageResponse(0, "");
@@ -98,11 +95,23 @@ public class TSegmentMetaController {
             return new MessageResponse(0, "id:" + segment_id + " is not exists");
         }
 
-        try {
-            segment_meta.setUpdateTime(System.currentTimeMillis());
-            tSegmentMetaRepository.save(item.get().merge(segment_meta));
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
+        segment_meta.setCreateUserName("admin");
+        segment_meta.setCreateGroupName("group");
+        segment_meta.setPlatformId(1);
+        segment_meta.setPlatformName("infinivision");
+        segment_meta.setUpdateTime(System.currentTimeMillis());
+
+        tSegmentMetaRepository.save(item.get().merge(segment_meta));
+
+        if (null != segment_meta.getRules() && 0 < segment_meta.getRules().length()) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                SegmentRulesBean rules_bean = mapper.readValue(segment_meta.getRules() , SegmentRulesBean.class);
+
+                updateRules(segment_meta, rules_bean, System.currentTimeMillis());
+            } catch (Exception e) {
+                return new MessageResponse(-1, "rules:" + segment_meta.getRules() + " is invalid");
+            }
         }
 
         return new MessageResponse(0, "");
@@ -119,11 +128,13 @@ public class TSegmentMetaController {
             return new MessageResponse(0, "id:" + segment_id + " is not exists");
         }
 
-        try {
-            tSegmentMetaRepository.deleteById(segment_id);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
+        tSegmentMetaRepository.deleteById(segment_id);
+
+        Optional<TTagEntity> tag_item = tTagRepository.findById(segment_id);
+        if (tag_item.isPresent()) {
+            tTagRepository.deleteById(segment_id);
         }
+
 
         return new MessageResponse(0, "");
     }
@@ -166,42 +177,84 @@ public class TSegmentMetaController {
         return new GetListMessageResponse<TCustomerEntity>(0, "", page, size, page_raw_customer_ids.getTotalElements(), customers);
     }
 
+    @GetMapping("/query_by_category/{category_id}")
+    public GetListMessageResponse<TSegmentMetaEntity> getTSegmentListByCategory(
+            @PathVariable("category_id") String category_id,
+            @RequestParam("page") Integer page,
+            @RequestParam("size") Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("updateTime"));
+
+        Page<TSegmentMetaEntity> page_list = tSegmentMetaRepository.findByCategory(category_id, pageable);
+
+        return new GetListMessageResponse<TSegmentMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
+    }
+
     private void insertRule(TSegmentMetaEntity segment_meta, SegmentRuleBean rule, Long now) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date(now);
         String cur_date = dateFormat.format(date);
         if ("AND" == rule.getLogic().toUpperCase()) {
-            tTagRepository.insertSegmentLogicAnd(rule.getIds(), segment_meta.getId(), cur_date, now, segment_meta.getCreateUserName(), segment_meta.getCreateGroupName(), segment_meta.getPlatformId(), segment_meta.getPlatformName());
+            tTagRepository.insertAnd(rule.getIds(), segment_meta.getId(), cur_date, now, segment_meta.getCreateUserName(), segment_meta.getCreateGroupName(), segment_meta.getPlatformId(), segment_meta.getPlatformName());
         } else {
-            tTagRepository.insertSegmentLogicOr(rule.getIds(), segment_meta.getId(), cur_date, now, segment_meta.getCreateUserName(), segment_meta.getCreateGroupName(), segment_meta.getPlatformId(), segment_meta.getPlatformName());
+            tTagRepository.insertOr(rule.getIds(), segment_meta.getId(), cur_date, now, segment_meta.getCreateUserName(), segment_meta.getCreateGroupName(), segment_meta.getPlatformId(), segment_meta.getPlatformName());
         }
     }
 
-    private void updateRule(TSegmentMetaEntity segment_meta, String logic, SegmentRuleBean rule, Long now) {
+    private void updateRule(TSegmentMetaEntity segment_meta, SegmentRuleBean rule, Long now) {
+        if ("AND" == rule.getLogic().toUpperCase()) {
+            tTagRepository.updateTagAnd(rule.getIds(), segment_meta.getId(), now);
+        } else {
+            tTagRepository.updateTagOr(rule.getIds(), segment_meta.getId(), now);
+        }
+    }
+
+    private void addRule(TSegmentMetaEntity segment_meta, String logic, SegmentRuleBean rule, Long now) {
         if ("AND" == logic) {
             if ("AND" == rule.getLogic().toUpperCase()) {
-                tTagRepository.updateTagLogicAndAnd(rule.getIds(), segment_meta.getId(), now);
+                tTagRepository.updateTagAndAnd(rule.getIds(), segment_meta.getId(), now);
             } else {
-                tTagRepository.updateTagLogicAndOr(rule.getIds(), segment_meta.getId(), now);
+                tTagRepository.updateTagAndOr(rule.getIds(), segment_meta.getId(), now);
             }
         } else {
             if ("AND" == rule.getLogic().toUpperCase()) {
-                tTagRepository.updateTagLogicOrAnd(rule.getIds(), segment_meta.getId(), now);
+                tTagRepository.updateTagOrAnd(rule.getIds(), segment_meta.getId(), now);
             } else {
-                tTagRepository.updateTagLogicOrOr(rule.getIds(), segment_meta.getId(), now);
+                tTagRepository.updateTagOrOr(rule.getIds(), segment_meta.getId(), now);
             }
+        }
+    }
+
+    private void addRules(TSegmentMetaEntity segment_meta, SegmentRulesBean rules, Long now) {
+        if (0 >= rules.getRules().size()) {
+            return;
+        }
+
+        for (SegmentRuleBean item: rules.getRules()) {
+            addRule(segment_meta, rules.getLogic(), item, now);
         }
     }
 
     private void insertRules(TSegmentMetaEntity segment_meta, SegmentRulesBean rules, Long now) {
-        boolean is_exist = false;
-        for (SegmentRuleBean item: rules.getRules()) {
-            if (is_exist) {
-                updateRule(segment_meta, rules.getLogic(), item, now);
-            } else {
-                is_exist = true;
-                insertRule(segment_meta, item, now);
-            }
+        if (0 >= rules.getRules().size()) {
+            return;
         }
+
+        insertRule(segment_meta, rules.getRules().get(0), now);
+
+        rules.getRules().remove(0);
+
+        addRules(segment_meta, rules, now);
+    }
+
+    private void updateRules(TSegmentMetaEntity segment_meta, SegmentRulesBean rules, Long now) {
+        if (0 >= rules.getRules().size()) {
+            return;
+        }
+
+        updateRule(segment_meta, rules.getRules().get(0), now);
+
+        rules.getRules().remove(0);
+
+        addRules(segment_meta, rules, now);
     }
 }

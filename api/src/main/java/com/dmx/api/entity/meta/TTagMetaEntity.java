@@ -18,11 +18,9 @@ public class TTagMetaEntity {
     private byte isSystem;
     @NotNull(message = "category must not be null")
     private String category;
-    private String parentCategory;
-    private String categoryTree;
     @NotNull(message = "rules must not be null")
     private String rules;
-    private Long customerCount;
+    private Long count;
     private String description;
     private Long updateTime;
     private Long createTime;
@@ -44,8 +42,8 @@ public class TTagMetaEntity {
     @PrePersist
     public void uuid() {
         this.id = UUID.randomUUID().toString().toUpperCase();
-        this.updateTime = System.currentTimeMillis();
-        this.createTime = System.currentTimeMillis();
+        this.updateTime = System.currentTimeMillis()/1000;
+        this.createTime = System.currentTimeMillis()/1000;
     }
 
     @javax.persistence.Basic
@@ -100,26 +98,6 @@ public class TTagMetaEntity {
     }
 
     @javax.persistence.Basic
-    @javax.persistence.Column(name = "parent_category", nullable = false, length = 512)
-    public java.lang.String getParentCategory() {
-        return parentCategory;
-    }
-
-    public void setParentCategory(java.lang.String parentCategory) {
-        this.parentCategory = parentCategory;
-    }
-
-    @javax.persistence.Basic
-    @javax.persistence.Column(name = "category_tree", nullable = false, length = 8096)
-    public java.lang.String getCategoryTree() {
-        return categoryTree;
-    }
-
-    public void setCategoryTree(java.lang.String categoryTree) {
-        this.categoryTree = categoryTree;
-    }
-
-    @javax.persistence.Basic
     @javax.persistence.Column(name = "rules", nullable = false, length = 8096)
     public java.lang.String getRules() {
         return rules;
@@ -130,13 +108,13 @@ public class TTagMetaEntity {
     }
 
     @javax.persistence.Basic
-    @javax.persistence.Column(name = "customer_count", nullable = false)
-    public Long getCustomerCount() {
-        return customerCount;
+    @javax.persistence.Column(name = "count", nullable = false)
+    public Long getCount() {
+        return count;
     }
 
-    public void setCustomerCount(Long customerCount) {
-        this.customerCount = customerCount;
+    public void setCount(Long count) {
+        this.count = count;
     }
 
     @javax.persistence.Basic
@@ -223,9 +201,6 @@ public class TTagMetaEntity {
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (category != null ? !category.equals(that.category) : that.category != null) return false;
-        if (parentCategory != null ? !parentCategory.equals(that.parentCategory) : that.parentCategory != null)
-            return false;
-        if (categoryTree != null ? !categoryTree.equals(that.categoryTree) : that.categoryTree != null) return false;
         if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null) return false;
@@ -247,8 +222,6 @@ public class TTagMetaEntity {
         result = 31 * result + (int) isStatic;
         result = 31 * result + (int) isSystem;
         result = 31 * result + (category != null ? category.hashCode() : 0);
-        result = 31 * result + (parentCategory != null ? parentCategory.hashCode() : 0);
-        result = 31 * result + (categoryTree != null ? categoryTree.hashCode() : 0);
         result = 31 * result + (rules != null ? rules.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
@@ -266,7 +239,6 @@ public class TTagMetaEntity {
         if (0 < o.getIsStatic()) this.isStatic = o.getIsStatic();
         if (0 < o.getIsSystem()) this.isSystem = o.getIsSystem();
         if (null != o.getCategory()) this.category = o.getCategory();
-        if (null != o.getParentCategory()) this.parentCategory = o.getParentCategory();
         if (null != o.getRules()) this.rules = o.getRules();
         if (null != o.getDescription()) this.description = o.getDescription();
         if (null != o.getUpdateTime()) this.updateTime = o.getUpdateTime();

@@ -1,6 +1,7 @@
 *idea*
 api/*idea*
 api/target
+api/out
 api/*.DS*
 *.DS*
 

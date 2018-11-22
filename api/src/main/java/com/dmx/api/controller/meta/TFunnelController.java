@@ -44,11 +44,7 @@ public class TFunnelController {
             return new MessageResponse(-1, "name:" + funnel.getName() + " is exists");
         }
 
-        try {
-            tFunnelRepository.save(funnel);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tFunnelRepository.save(funnel);
 
         return new MessageResponse(0, "");
     }
@@ -64,12 +60,8 @@ public class TFunnelController {
             return new MessageResponse(0, "id:" + funnel_id + " is not exists");
         }
 
-        try {
-            journey.setUpdateTime(System.currentTimeMillis());
-            tFunnelRepository.save(item.get().merge(journey));
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        journey.setUpdateTime(System.currentTimeMillis());
+        tFunnelRepository.save(item.get().merge(journey));
 
         return new MessageResponse(0, "");
     }
@@ -85,11 +77,7 @@ public class TFunnelController {
             return new MessageResponse(0, "id:" + funnel_id + " is not exists");
         }
 
-        try {
-            tFunnelRepository.deleteById(funnel_id);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tFunnelRepository.deleteById(funnel_id);
 
         return new MessageResponse(0, "");
     }

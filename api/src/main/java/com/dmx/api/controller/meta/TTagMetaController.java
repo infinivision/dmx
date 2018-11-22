@@ -56,11 +56,12 @@ public class TTagMetaController {
             return new MessageResponse(-1, "name:" + tag_meta.getName() + " is exists");
         }
 
-        try {
-            tTagMetaRepository.save(tag_meta);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tag_meta.setCreateUserName("admin");
+        tag_meta.setCreateGroupName("group");
+        tag_meta.setPlatformId(1);
+        tag_meta.setPlatformName("infinivision");
+
+        tTagMetaRepository.save(tag_meta);
 
         return new MessageResponse(0, "");
     }
@@ -76,12 +77,8 @@ public class TTagMetaController {
             return new MessageResponse(0, "id:" + tag_id + " is not exists");
         }
 
-        try {
-            tag_meta.setUpdateTime(System.currentTimeMillis());
-            tTagMetaRepository.save(item.get().merge(tag_meta));
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tag_meta.setUpdateTime(System.currentTimeMillis());
+        tTagMetaRepository.save(item.get().merge(tag_meta));
 
         return new MessageResponse(0, "");
     }
@@ -97,11 +94,7 @@ public class TTagMetaController {
             return new MessageResponse(0, "id:" + tag_id + " is not exists");
         }
 
-        try {
-            tTagMetaRepository.deleteById(tag_id);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tTagMetaRepository.deleteById(tag_id);
 
         return new MessageResponse(0, "");
     }
@@ -142,5 +135,17 @@ public class TTagMetaController {
         List<TCustomerEntity> customers = tCustomerRepository.findByIdInOrderById(customer_ids);
 
         return new GetListMessageResponse<TCustomerEntity>(0, "", page, size, page_raw_customer_ids.getTotalElements(), customers);
+    }
+
+    @GetMapping("/query_by_category/{category_id}")
+    public GetListMessageResponse<TTagMetaEntity> getTTagMetaListByCategory(
+                                                                    @PathVariable("category_id") String category_id,
+                                                                    @RequestParam("page") Integer page,
+                                                                    @RequestParam("size") Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("updateTime"));
+
+        Page<TTagMetaEntity> page_list = tTagMetaRepository.findByCategory(category_id, pageable);
+
+        return new GetListMessageResponse<TTagMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
     }
 }

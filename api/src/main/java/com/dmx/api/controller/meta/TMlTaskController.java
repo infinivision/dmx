@@ -44,11 +44,7 @@ public class TMlTaskController {
             return new MessageResponse(-1, "name:" + ml_task.getName() + " is exists");
         }
 
-        try {
-            tMlTaskRepository.save(ml_task);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tMlTaskRepository.save(ml_task);
 
         return new MessageResponse(0, "");
     }
@@ -64,12 +60,8 @@ public class TMlTaskController {
             return new MessageResponse(0, "id:" + task_id + " is not exists");
         }
 
-        try {
-            ml_task.setUpdateTime(System.currentTimeMillis());
-            tMlTaskRepository.save(item.get().merge(ml_task));
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        ml_task.setUpdateTime(System.currentTimeMillis());
+        tMlTaskRepository.save(item.get().merge(ml_task));
 
         return new MessageResponse(0, "");
     }
@@ -85,11 +77,7 @@ public class TMlTaskController {
             return new MessageResponse(0, "id:" + task_id + " is not exists");
         }
 
-        try {
-            tMlTaskRepository.deleteById(task_id);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tMlTaskRepository.deleteById(task_id);
 
         return new MessageResponse(0, "");
     }

@@ -32,8 +32,8 @@ public class TJourneyEntity {
     @PrePersist
     public void uuid() {
         this.id = UUID.randomUUID().toString().toUpperCase();
-        this.updateTime = System.currentTimeMillis();
-        this.createTime = System.currentTimeMillis();
+        this.updateTime = System.currentTimeMillis()/1000;
+        this.createTime = System.currentTimeMillis()/1000;
     }
 
     @javax.persistence.Basic

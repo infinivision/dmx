@@ -44,11 +44,7 @@ public class TJourneyController {
             return new MessageResponse(-1, "name:" + journey.getName() + " is exists");
         }
 
-        try {
-            tJourneyRepository.save(journey);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tJourneyRepository.save(journey);
 
         return new MessageResponse(0, "");
     }
@@ -64,12 +60,8 @@ public class TJourneyController {
             return new MessageResponse(0, "id:" + journey_id + " is not exists");
         }
 
-        try {
-            journey.setUpdateTime(System.currentTimeMillis());
-            tJourneyRepository.save(item.get().merge(journey));
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        journey.setUpdateTime(System.currentTimeMillis());
+        tJourneyRepository.save(item.get().merge(journey));
 
         return new MessageResponse(0, "");
     }
@@ -85,11 +77,7 @@ public class TJourneyController {
             return new MessageResponse(0, "id:" + journey_id + " is not exists");
         }
 
-        try {
-            tJourneyRepository.deleteById(journey_id);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tJourneyRepository.deleteById(journey_id);
 
         return new MessageResponse(0, "");
     }

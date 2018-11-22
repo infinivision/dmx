@@ -17,7 +17,7 @@ import org.springframework.data.domain.Sort;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/event_meta")
+@RequestMapping(value = "/event")
 
 public class TEventMetaController {
     @Autowired
@@ -44,11 +44,7 @@ public class TEventMetaController {
             return new MessageResponse(-1, "name:" + event.getName() + " is exists");
         }
 
-        try {
-            tEventMetaRepository.save(event);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tEventMetaRepository.save(event);
 
         return new MessageResponse(0, "");
     }
@@ -64,12 +60,8 @@ public class TEventMetaController {
             return new MessageResponse(0, "id:" + event_id + " is not exists");
         }
 
-        try {
-            event.setUpdateTime(System.currentTimeMillis());
-            tEventMetaRepository.save(item.get().merge(event));
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        event.setUpdateTime(System.currentTimeMillis());
+        tEventMetaRepository.save(item.get().merge(event));
 
         return new MessageResponse(0, "");
     }
@@ -85,11 +77,7 @@ public class TEventMetaController {
             return new MessageResponse(0, "id:" + event_id + " is not exists");
         }
 
-        try {
-            tEventMetaRepository.deleteById(event_id);
-        } catch (Exception e) {
-            return new MessageResponse(-1, e.getMessage());
-        }
+        tEventMetaRepository.deleteById(event_id);
 
         return new MessageResponse(0, "");
     }
