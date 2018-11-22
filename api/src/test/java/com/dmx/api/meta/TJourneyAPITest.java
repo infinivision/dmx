@@ -2,8 +2,10 @@ package com.dmx.api.meta;
 
 import com.dmx.api.bean.GetListMessageResponse;
 import com.dmx.api.bean.MessageResponse;
-import com.dmx.api.dao.meta.TEventMetaRepository;
-import com.dmx.api.entity.meta.TEventMetaEntity;
+import com.dmx.api.dao.meta.TFunnelRepository;
+import com.dmx.api.dao.meta.TJourneyRepository;
+import com.dmx.api.entity.meta.TFunnelEntity;
+import com.dmx.api.entity.meta.TJourneyEntity;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +24,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"management.port=0"})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TEventMetaAPITest {
+public class TJourneyAPITest {
     @LocalServerPort
     private int port;
 
@@ -30,16 +32,14 @@ public class TEventMetaAPITest {
     private TestRestTemplate testRestTemplate;
 
     @Autowired
-    private TEventMetaRepository tEventMetaRepository;
+    TJourneyRepository tJourneyRepository;
 
     private String name = "test";
-    private Integer applicationId = 1;
-    private String applicationName = "test";
-    private Integer type = 1;
-    private String objectId = "BUTTON";
-    private Integer objectIdHash = 123456;
-    private String pageUrl = "test";
-    private String pageHost = "www.host.com";
+    private Integer step = 1;
+    private String eventName = "test";
+    private Integer eventNameHash = 0;
+    private Integer customerCount = 0;
+
     private Long updateTime = System.currentTimeMillis() / 1000;
     private Long createTime = System.currentTimeMillis() / 1000;
     private String createUserName = "admin";
@@ -49,17 +49,13 @@ public class TEventMetaAPITest {
 
     @Test
     public void test01() throws Exception {
-        TEventMetaEntity bean = new TEventMetaEntity();
+        TJourneyEntity bean = new TJourneyEntity();
 
         bean.setName(name);
-        bean.setApplicationId(applicationId);
-        bean.setApplicationName(applicationName);
-        bean.setType(type);
-        bean.setObjectId(objectId);
-        bean.setObjectIdHash(objectIdHash);
-        bean.setApplicationId(applicationId);
-        bean.setPageUrl(pageUrl);
-        bean.setPageHost(pageHost);
+        bean.setStep(step);
+        bean.setCustomerCount(customerCount);
+        bean.setEventName(eventName);
+        bean.setEventNameHash(eventNameHash);
         bean.setUpdateTime(updateTime);
         bean.setCreateTime(createTime);
         bean.setCreateUserName(createUserName);
@@ -68,25 +64,24 @@ public class TEventMetaAPITest {
         bean.setPlatformName(platformName);
 
         HttpHeaders requestHeaders = new HttpHeaders();
-        HttpEntity<TEventMetaEntity> req_entity = new HttpEntity<TEventMetaEntity>(bean, requestHeaders);
+        HttpEntity<TJourneyEntity> req_entity = new HttpEntity<TJourneyEntity>(bean, requestHeaders);
 
         ResponseEntity<MessageResponse> entity = this.testRestTemplate.exchange(
-                "http://localhost:" + this.port + "/event", HttpMethod.POST, req_entity,  MessageResponse.class);
+                "http://localhost:" + this.port + "/journey", HttpMethod.POST, req_entity,  MessageResponse.class);
         then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
         then(entity.hasBody()).isEqualTo(true);
         then(entity.getBody().getCode()).isEqualTo(0);
         then(entity.getBody().getMsg()).isEqualTo("");
     }
 
-
     @Test
     public void test02() throws Exception {
-        TEventMetaEntity item = tEventMetaRepository.findByName(name);
+        TJourneyEntity item = tJourneyRepository.findByName(name);
         then(item).isNotEqualTo(null);
         then(item.getName()).isEqualTo(name);
 
         ResponseEntity<MessageResponse> entity = this.testRestTemplate.exchange(
-                "http://localhost:" + this.port + "/event" + "/" + item.getId(),
+                "http://localhost:" + this.port + "/journey" + "/" + item.getId(),
                 HttpMethod.GET, null, MessageResponse.class);
         then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
         then(entity.hasBody()).isEqualTo(true);
@@ -96,19 +91,19 @@ public class TEventMetaAPITest {
 
     @Test
     public void test03() throws Exception {
-        TEventMetaEntity bean = new TEventMetaEntity();
+        TJourneyEntity bean = new TJourneyEntity();
 
-        bean.setPageUrl("index");
+        bean.setEventName("index");
 
-        TEventMetaEntity item = tEventMetaRepository.findByName(name);
+        TJourneyEntity item = tJourneyRepository.findByName(name);
         then(item).isNotEqualTo(null);
         then(item.getName()).isEqualTo(name);
 
         HttpHeaders requestHeaders = new HttpHeaders();
-        HttpEntity<TEventMetaEntity> req_entity = new HttpEntity<TEventMetaEntity>(bean, requestHeaders);
+        HttpEntity<TJourneyEntity> req_entity = new HttpEntity<TJourneyEntity>(bean, requestHeaders);
 
         ResponseEntity<MessageResponse> entity = this.testRestTemplate.exchange(
-                "http://localhost:" + this.port + "/event" + "/" + item.getId(),
+                "http://localhost:" + this.port + "/journey" + "/" + item.getId(),
                 HttpMethod.PUT, req_entity,  MessageResponse.class);
         then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
         then(entity.hasBody()).isEqualTo(true);
@@ -119,7 +114,7 @@ public class TEventMetaAPITest {
     @Test
     public void test04() throws Exception {
         ResponseEntity<GetListMessageResponse> entity = this.testRestTemplate.exchange(
-                "http://localhost:" + this.port + "/event" + "/list?page=0&size=10",
+                "http://localhost:" + this.port + "/journey" + "/list?page=0&size=10",
                 HttpMethod.GET, null, GetListMessageResponse.class);
         then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
         then(entity.hasBody()).isEqualTo(true);
@@ -129,13 +124,13 @@ public class TEventMetaAPITest {
 
     @Test
     public void test99() throws Exception {
-        TEventMetaEntity item = tEventMetaRepository.findByName(name);
+        TJourneyEntity item = tJourneyRepository.findByName(name);
         then(item).isNotEqualTo(null);
         then(item.getName()).isEqualTo(name);
 
         HttpHeaders requestHeaders = new HttpHeaders();
         ResponseEntity<MessageResponse> entity = this.testRestTemplate.exchange(
-                "http://localhost:" + this.port + "/event" + "/" + item.getId(),
+                "http://localhost:" + this.port + "/journey" + "/" + item.getId(),
                 HttpMethod.DELETE, null, MessageResponse.class);
         then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
         then(entity.hasBody()).isEqualTo(true);
