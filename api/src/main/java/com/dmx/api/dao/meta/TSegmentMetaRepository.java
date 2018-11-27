@@ -10,4 +10,5 @@ import org.springframework.data.repository.query.Param;
 public interface TSegmentMetaRepository extends JpaRepository<TSegmentMetaEntity, String> {
     Page<TSegmentMetaEntity> findByCategory(String category, Pageable pageable);
     TSegmentMetaEntity findByName(String name);
+    Page<TSegmentMetaEntity> findByNameContains(String name, Pageable pageable);
 }

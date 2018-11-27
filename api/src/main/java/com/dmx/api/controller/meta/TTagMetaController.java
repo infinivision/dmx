@@ -7,6 +7,7 @@ import com.dmx.api.dao.analysis.TCustomerRepository;
 import com.dmx.api.dao.analysis.TTagRepository;
 import com.dmx.api.dao.meta.TTagMetaRepository;
 import com.dmx.api.entity.analysis.TCustomerEntity;
+import com.dmx.api.entity.meta.TSegmentMetaEntity;
 import com.dmx.api.entity.meta.TTagMetaEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -101,8 +102,19 @@ public class TTagMetaController {
 
     @GetMapping("/list")
     public GetListMessageResponse<TTagMetaEntity> getTTagMetaList(@RequestParam("page") Integer page,
-                                                                  @RequestParam("size") Integer size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("updateTime"));
+                                                                  @RequestParam("size") Integer size,
+                                                                  @RequestParam(value = "sort", required = false, defaultValue = "updateTime") String sort,
+                                                                  @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
+
+        if (!sort.equalsIgnoreCase("count") && !sort.equalsIgnoreCase("updateTime")) {
+            return new GetListMessageResponse<TTagMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
+            return new GetListMessageResponse<TTagMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
 
         Page<TTagMetaEntity> page_list = tTagMetaRepository.findAll(pageable);
 
@@ -141,10 +153,42 @@ public class TTagMetaController {
     public GetListMessageResponse<TTagMetaEntity> getTTagMetaListByCategory(
                                                                     @PathVariable("category_id") String category_id,
                                                                     @RequestParam("page") Integer page,
-                                                                    @RequestParam("size") Integer size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("updateTime"));
+                                                                    @RequestParam("size") Integer size,
+                                                                    @RequestParam(value = "sort", required = false, defaultValue = "updateTime") String sort,
+                                                                    @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
+        if (!sort.equalsIgnoreCase("count") && !sort.equalsIgnoreCase("updateTime")) {
+            return new GetListMessageResponse<TTagMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
+            return new GetListMessageResponse<TTagMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
 
         Page<TTagMetaEntity> page_list = tTagMetaRepository.findByCategory(category_id, pageable);
+
+        return new GetListMessageResponse<TTagMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
+    }
+
+    @GetMapping("/query_by_name/{name}")
+    public GetListMessageResponse<TTagMetaEntity> getTTagMetaListByName(
+            @PathVariable("name") String name,
+            @RequestParam("page") Integer page,
+            @RequestParam("size") Integer size,
+            @RequestParam(value = "sort", required = false, defaultValue = "updateTime") String sort,
+            @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
+        if (!sort.equalsIgnoreCase("count") && !sort.equalsIgnoreCase("updateTime")) {
+            return new GetListMessageResponse<TTagMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
+            return new GetListMessageResponse<TTagMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
+
+        Page<TTagMetaEntity> page_list = tTagMetaRepository.findByNameContains(name, pageable);
 
         return new GetListMessageResponse<TTagMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
     }

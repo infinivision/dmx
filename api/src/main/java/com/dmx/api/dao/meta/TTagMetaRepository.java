@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TTagMetaRepository extends JpaRepository<TTagMetaEntity, String>  {
     Page<TTagMetaEntity> findByCategory(String category, Pageable pageable);
     TTagMetaEntity findByName(String name);
+    Page<TTagMetaEntity> findByNameContains(String name, Pageable pageable);
 }

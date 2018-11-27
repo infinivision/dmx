@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/segment")
@@ -141,8 +142,18 @@ public class TSegmentMetaController {
 
     @GetMapping("/list")
     public GetListMessageResponse<TSegmentMetaEntity> getTSegmentMetaList(@RequestParam("page") Integer page,
-                                                                  @RequestParam("size") Integer size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("updateTime"));
+                                                                          @RequestParam("size") Integer size,
+                                                                          @RequestParam(value = "sort", required = false, defaultValue = "updateTime") String sort,
+                                                                          @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
+        if (!sort.equalsIgnoreCase("customerCount") && !sort.equalsIgnoreCase("updateTime")) {
+            return new GetListMessageResponse<TSegmentMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
+            return new GetListMessageResponse<TSegmentMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
 
         Page<TSegmentMetaEntity> page_list = tSegmentMetaRepository.findAll(pageable);
 
@@ -167,10 +178,9 @@ public class TSegmentMetaController {
             return new GetListMessageResponse<TCustomerEntity>(-1, "segment id:" + segment_id + " has no customers", page, size, new Long(0), null);
         }
 
-        List<Long> customer_ids = new ArrayList<>();
-        for (int i = 0 ; i < customer_size; ++i) {
-            customer_ids.add(page_raw_customer_ids.getContent().get(i).longValue());
-        }
+        List<Long> customer_ids = page_raw_customer_ids.stream()
+                .map(s -> s.longValue())
+                .collect(Collectors.toList());
 
         List<TCustomerEntity> customers = tCustomerRepository.findByIdInOrderById(customer_ids);
 
@@ -181,10 +191,42 @@ public class TSegmentMetaController {
     public GetListMessageResponse<TSegmentMetaEntity> getTSegmentListByCategory(
             @PathVariable("category_id") String category_id,
             @RequestParam("page") Integer page,
-            @RequestParam("size") Integer size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("updateTime"));
+            @RequestParam("size") Integer size,
+            @RequestParam(value = "sort", required = false, defaultValue = "updateTime") String sort,
+            @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
+        if (!sort.equalsIgnoreCase("customerCount") && !sort.equalsIgnoreCase("updateTime")) {
+            return new GetListMessageResponse<TSegmentMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
+            return new GetListMessageResponse<TSegmentMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
 
         Page<TSegmentMetaEntity> page_list = tSegmentMetaRepository.findByCategory(category_id, pageable);
+
+        return new GetListMessageResponse<TSegmentMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
+    }
+
+    @GetMapping("/query_by_name/{name}")
+    public GetListMessageResponse<TSegmentMetaEntity> getTSegmentListByName(
+            @PathVariable("name") String name,
+            @RequestParam("page") Integer page,
+            @RequestParam("size") Integer size,
+            @RequestParam(value = "sort", required = false, defaultValue = "updateTime") String sort,
+            @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
+        if (!sort.equalsIgnoreCase("customerCount") && !sort.equalsIgnoreCase("updateTime")) {
+            return new GetListMessageResponse<TSegmentMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
+            return new GetListMessageResponse<TSegmentMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
+        }
+
+        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
+
+        Page<TSegmentMetaEntity> page_list = tSegmentMetaRepository.findByNameContains(name, pageable);
 
         return new GetListMessageResponse<TSegmentMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
     }
