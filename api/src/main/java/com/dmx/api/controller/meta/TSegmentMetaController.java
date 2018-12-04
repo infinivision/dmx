@@ -209,9 +209,9 @@ public class TSegmentMetaController {
         return new GetListMessageResponse<TSegmentMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
     }
 
-    @GetMapping("/query_by_name/{name}")
+    @GetMapping("/query_by_name")
     public GetListMessageResponse<TSegmentMetaEntity> getTSegmentListByName(
-            @PathVariable("name") String name,
+            @RequestParam("name") String name,
             @RequestParam("page") Integer page,
             @RequestParam("size") Integer size,
             @RequestParam(value = "sort", required = false, defaultValue = "updateTime") String sort,

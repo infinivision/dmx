@@ -121,8 +121,8 @@ public class TCategoryController {
     }
 
     @GetMapping("/root")
-    public GetListNoPageMessageResponse<TCategoryEntity> getRootCategoryList() {
-        List<TCategoryEntity> list = tCategoryRepository.findByLevel(0);
+    public GetListNoPageMessageResponse<TCategoryEntity> getRootCategoryList(@RequestParam(value = "type", defaultValue = "0") Integer type) {
+        List<TCategoryEntity> list = tCategoryRepository.findByLevelAndType(0, type);
 
         return new GetListNoPageMessageResponse<TCategoryEntity>(0, "", list);
     }
