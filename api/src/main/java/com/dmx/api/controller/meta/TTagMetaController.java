@@ -19,9 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/tag")
@@ -46,6 +44,17 @@ public class TTagMetaController {
         return new GetMessageResponse<TTagMetaEntity>(-1, "has no record:" + tag_id, null);
     }
 
+    @GetMapping("/is_name_exists")
+    public MessageResponse getTagMetaEntityByName(@RequestParam("name") String name) {
+        TTagMetaEntity item = tTagMetaRepository.findByName(name);
+
+        if (null == item) {
+            return new MessageResponse(-1, "has no record:" + name);
+        }
+
+        return new MessageResponse(0, "");
+    }
+
     @PostMapping("")
     public MessageResponse setTagMetaEntity(@Validated @RequestBody TTagMetaEntity tag_meta, BindingResult check) {
         if (check.hasErrors()) {
@@ -65,6 +74,45 @@ public class TTagMetaController {
         tTagMetaRepository.save(tag_meta);
 
         return new MessageResponse(0, "");
+    }
+
+    @PostMapping("/copy/{tag_id}")
+    public GetMessageResponse<Map<String, String>> copyTagMetaEntity(@PathVariable("tag_id") String tag_id) {
+        Optional<TTagMetaEntity> item = tTagMetaRepository.findById(tag_id);
+        if (!item.isPresent()) {
+            return new GetMessageResponse(-1, "id:" + tag_id + " is not exists", null);
+        }
+
+        TTagMetaEntity tag_meta = item.get();
+
+        String name = tag_meta.getName() + "_copy";
+
+        TTagMetaEntity item_by_name = tTagMetaRepository.findByName(name);
+        if (null != item_by_name) {
+            return new GetMessageResponse(-1, "name:" + name + " is exists", null);
+        }
+
+        TTagMetaEntity new_item = new TTagMetaEntity();
+
+        new_item.setName(name);
+        new_item.setRules(tag_meta.getRules());
+        new_item.setCategory(tag_meta.getCategory());
+        new_item.setType(tag_meta.getType());
+        new_item.setCount(tag_meta.getCount());
+        new_item.setIsSystem(tag_meta.getIsSystem());
+        new_item.setIsStatic(tag_meta.getIsStatic());
+        new_item.setDescription(tag_meta.getDescription());
+        new_item.setCreateUserName(tag_meta.getCreateUserName());
+        new_item.setCreateGroupName(tag_meta.getCreateGroupName());
+        new_item.setPlatformId(tag_meta.getPlatformId());
+        new_item.setPlatformName(tag_meta.getPlatformName());
+
+        tTagMetaRepository.save(new_item);
+
+        Map<String, String> result = new HashMap<>();
+        result.put("id", new_item.getId());
+
+        return new GetMessageResponse(0, "", result);
     }
 
     @PutMapping("/{tag_id}")

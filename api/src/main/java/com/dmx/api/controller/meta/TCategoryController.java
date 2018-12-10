@@ -40,9 +40,11 @@ public class TCategoryController {
             return new MessageResponse(-1, check.getAllErrors().get(0).getDefaultMessage());
         }
 
+        Integer type = null == category.getType()? 0:category.getType();
+
         TCategoryEntity item = tCategoryRepository.findByName(category.getName());
-        if (null != item) {
-            return new MessageResponse(-1, "name:" + category.getName() + " is exists");
+        if (null != item && type == item.getType()) {
+            return new MessageResponse(-1, "name:" + category.getName() + " and type:" + type + " is exists");
         }
 
         if (null == category.getParent() || 0 >= category.getParent().length()) {
@@ -104,13 +106,14 @@ public class TCategoryController {
     }
 
     @GetMapping("/list")
-    public GetListMessageResponse<TCategoryEntity> getCategoryList(@RequestParam("page") Integer page,
-                                                                  @RequestParam("size") Integer size) {
+    public GetListNoPageMessageResponse<TCategoryEntity> getCategoryList(@RequestParam(value = "page", defaultValue = "0", required = false) Integer page,
+                                                                  @RequestParam(value = "size", defaultValue = "10000", required = false) Integer size,
+                                                                         @RequestParam(value = "type", defaultValue = "0", required = false) Integer type) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("updateTime"));
 
-        Page<TCategoryEntity> page_list = tCategoryRepository.findAll(pageable);
+        Page<TCategoryEntity> page_list = tCategoryRepository.findByType(type, pageable);
 
-        return new GetListMessageResponse<TCategoryEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
+        return new GetListNoPageMessageResponse<TCategoryEntity>(0, "", page_list.getContent());
     }
 
     @GetMapping("/{category_id}/list")

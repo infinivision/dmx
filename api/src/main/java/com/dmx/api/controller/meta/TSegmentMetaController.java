@@ -24,10 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -51,6 +48,17 @@ public class TSegmentMetaController {
         }
 
         return new GetMessageResponse<TSegmentMetaEntity>(-1, "has no record:" + segment_id, null);
+    }
+
+    @GetMapping("/is_name_exists")
+    public MessageResponse getSegmentMetaEntityByName(@RequestParam("name") String name) {
+        TSegmentMetaEntity item = tSegmentMetaRepository.findByName(name);
+
+        if (null == item) {
+            return new MessageResponse(-1, "has no record:" + name);
+        }
+
+        return new MessageResponse(0, "");
     }
 
     @PostMapping("")
@@ -83,6 +91,42 @@ public class TSegmentMetaController {
         }
 
         return new MessageResponse(0, "");
+    }
+
+    @PostMapping("/copy/{segment_id}")
+    public GetMessageResponse<Map<String, String>> copyTagMetaEntity(@PathVariable("segment_id") String segment_id) {
+        Optional<TSegmentMetaEntity> item = tSegmentMetaRepository.findById(segment_id);
+        if (!item.isPresent()) {
+            return new GetMessageResponse(-1, "id:" + segment_id + " is not exists", null);
+        }
+
+        TSegmentMetaEntity segment_meta = item.get();
+
+        String name = segment_meta.getName() + "_copy";
+
+        TSegmentMetaEntity item_by_name = tSegmentMetaRepository.findByName(name);
+        if (null != item_by_name) {
+            return new GetMessageResponse(-1, "name:" + name + " is exists", null);
+        }
+
+        TSegmentMetaEntity new_item = new TSegmentMetaEntity();
+
+        new_item.setName(name);
+        new_item.setRules(segment_meta.getRules());
+        new_item.setCategory(segment_meta.getCategory());
+        new_item.setCustomerCount(segment_meta.getCustomerCount());
+        new_item.setDescription(segment_meta.getDescription());
+        new_item.setCreateUserName(segment_meta.getCreateUserName());
+        new_item.setCreateGroupName(segment_meta.getCreateGroupName());
+        new_item.setPlatformId(segment_meta.getPlatformId());
+        new_item.setPlatformName(segment_meta.getPlatformName());
+
+        tSegmentMetaRepository.save(new_item);
+
+        Map<String, String> result = new HashMap<>();
+        result.put("id", new_item.getId());
+
+        return new GetMessageResponse(0, "", result);
     }
 
     @PutMapping("/{segment_id}")

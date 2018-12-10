@@ -13,6 +13,7 @@ public class TColumnMetaEntity {
     private String category;
     private Integer calculateFlag;
     private String typeName;
+    private String enumValues;
     private Long updateTime;
     private Long createTime;
     private String createUserName;
@@ -76,6 +77,16 @@ public class TColumnMetaEntity {
 
     public void setTypeName(String typeName) {
         this.typeName = typeName;
+    }
+
+    @Basic
+    @Column(name = "enum_values", nullable = false, length = 8196)
+    public String getEnumValues() {
+        return enumValues;
+    }
+
+    public void setEnumValues(String enumValues) {
+        this.enumValues = enumValues;
     }
 
     @Basic
