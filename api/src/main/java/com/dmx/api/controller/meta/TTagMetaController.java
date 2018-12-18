@@ -49,10 +49,10 @@ public class TTagMetaController {
         TTagMetaEntity item = tTagMetaRepository.findByName(name);
 
         if (null == item) {
-            return new MessageResponse(-1, "has no record:" + name);
+            return new MessageResponse(0, "false");
         }
 
-        return new MessageResponse(0, "");
+        return new MessageResponse(0, "true");
     }
 
     @PostMapping("")
