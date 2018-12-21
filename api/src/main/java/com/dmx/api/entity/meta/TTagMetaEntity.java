@@ -11,19 +11,19 @@ public class TTagMetaEntity {
     @NotNull(message = "name must not be null")
     private String name;
     @NotNull(message = "type must not be null")
-    private short type;
+    private Integer type;
     @NotNull(message = "isStatic must not be null")
-    private byte isStatic;
+    private Integer isStatic;
     @NotNull(message = "isSystem must not be null")
-    private byte isSystem;
+    private Integer isSystem;
     @NotNull(message = "category must not be null")
     private String category;
     @NotNull(message = "rules must not be null")
     private String rules;
     private Long count;
     private String description;
-    private Long updateTime;
-    private Long createTime;
+    private Integer updateTime;
+    private Integer createTime;
     private String createUserName;
     private String createGroupName;
     private Integer platformId;
@@ -42,8 +42,8 @@ public class TTagMetaEntity {
     @PrePersist
     public void uuid() {
         this.id = UUID.randomUUID().toString().toUpperCase();
-        this.updateTime = System.currentTimeMillis()/1000;
-        this.createTime = System.currentTimeMillis()/1000;
+        this.updateTime = new Long(System.currentTimeMillis()/1000).intValue();
+        this.createTime = new Long(System.currentTimeMillis()/1000).intValue();
     }
 
     @javax.persistence.Basic
@@ -58,31 +58,31 @@ public class TTagMetaEntity {
 
     @javax.persistence.Basic
     @javax.persistence.Column(name = "type", nullable = false)
-    public short getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(short type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
     @javax.persistence.Basic
     @javax.persistence.Column(name = "is_static", nullable = false)
-    public byte getIsStatic() {
+    public Integer getIsStatic() {
         return isStatic;
     }
 
-    public void setIsStatic(byte isStatic) {
+    public void setIsStatic(Integer isStatic) {
         this.isStatic = isStatic;
     }
 
     @javax.persistence.Basic
     @javax.persistence.Column(name = "is_system", nullable = false)
-    public byte getIsSystem() {
+    public Integer getIsSystem() {
         return isSystem;
     }
 
-    public void setIsSystem(byte isSystem) {
+    public void setIsSystem(Integer isSystem) {
         this.isSystem = isSystem;
     }
 
@@ -129,21 +129,21 @@ public class TTagMetaEntity {
 
     @javax.persistence.Basic
     @javax.persistence.Column(name = "update_time", nullable = false)
-    public Long getUpdateTime() {
+    public Integer getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Long updateTime) {
+    public void setUpdateTime(Integer updateTime) {
         this.updateTime = updateTime;
     }
 
     @javax.persistence.Basic
     @javax.persistence.Column(name = "create_time", nullable = false)
-    public Long getCreateTime() {
+    public Integer getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Long createTime) {
+    public void setCreateTime(Integer createTime) {
         this.createTime = createTime;
     }
 
@@ -235,9 +235,9 @@ public class TTagMetaEntity {
 
     public TTagMetaEntity merge(TTagMetaEntity o) {
         if (null != o.getName()) this.name = o.getName();
-        if (0 < o.getType()) this.type = o.getType();
-        if (0 < o.getIsStatic()) this.isStatic = o.getIsStatic();
-        if (0 < o.getIsSystem()) this.isSystem = o.getIsSystem();
+        if (null != o.getType()) this.type = o.getType();
+        if (null != o.getIsStatic()) this.isStatic = o.getIsStatic();
+        if (null != o.getIsSystem()) this.isSystem = o.getIsSystem();
         if (null != o.getCategory()) this.category = o.getCategory();
         if (null != o.getRules()) this.rules = o.getRules();
         if (null != o.getDescription()) this.description = o.getDescription();

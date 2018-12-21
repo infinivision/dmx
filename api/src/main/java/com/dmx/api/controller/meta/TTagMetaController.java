@@ -126,7 +126,7 @@ public class TTagMetaController {
             return new MessageResponse(0, "id:" + tag_id + " is not exists");
         }
 
-        tag_meta.setUpdateTime(System.currentTimeMillis());
+        tag_meta.setUpdateTime(new Long(System.currentTimeMillis()/1000).intValue());
         tTagMetaRepository.save(item.get().merge(tag_meta));
 
         return new MessageResponse(0, "");

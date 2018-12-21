@@ -35,15 +35,15 @@ public class TTagMetaAPITest {
     TTagMetaRepository tTagMetaRepository;
 
     private String name = "test";
-    private short type = 1;
-    private byte isStatic = 1;
-    private byte isSystem = 1;
+    private Integer type = 1;
+    private Integer isStatic = 1;
+    private Integer isSystem = 1;
     private String category = "";
     private String rules = "";
     private Long count = new Long(0);
     private String description = "desc";
-    private Long updateTime = System.currentTimeMillis() / 1000;
-    private Long createTime = System.currentTimeMillis() / 1000;
+    private Integer updateTime = new Long(System.currentTimeMillis() / 1000).intValue();
+    private Integer createTime = new Long(System.currentTimeMillis() / 1000).intValue();
     private String createUserName = "admin";
     private String createGroupName = "group";
     private Integer platformId = 1;

@@ -113,7 +113,7 @@ public class UpdateCountService {
                     String customer_count = String.valueOf(item[1]);
 
                     if (tag_meta.getId().equals(id)) {
-                        list.get(i).setUpdateTime(System.currentTimeMillis() / 1000);
+                        list.get(i).setUpdateTime(new Long(System.currentTimeMillis() / 1000).intValue());
                         list.get(i).setCount(Long.parseLong(customer_count));
                         ++j;
                     } else {

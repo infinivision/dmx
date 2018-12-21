@@ -1,14 +1,14 @@
 package com.dmx.api.entity.meta;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "t_tag_task", schema = "db_dmx", catalog = "")
 public class TTagTaskEntity {
     private String id;
-    private Integer groupId;
     private Integer status;
-    private String jobId;
+    private byte[] jobId;
     private String jobName;
     private String tagList;
     private Long updateTime;
@@ -28,14 +28,11 @@ public class TTagTaskEntity {
         this.id = id;
     }
 
-    @Basic
-    @Column(name = "group_id", nullable = false)
-    public Integer getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(Integer groupId) {
-        this.groupId = groupId;
+    @PrePersist
+    public void uuid() {
+        this.id = UUID.randomUUID().toString().toUpperCase();
+        this.updateTime = System.currentTimeMillis()/1000;
+        this.createTime = System.currentTimeMillis()/1000;
     }
 
     @Basic
@@ -50,11 +47,11 @@ public class TTagTaskEntity {
 
     @Basic
     @Column(name = "job_id", nullable = false, length = 255)
-    public String getJobId() {
+    public byte[] getJobId() {
         return jobId;
     }
 
-    public void setJobId(String jobId) {
+    public void setJobId(byte[] jobId) {
         this.jobId = jobId;
     }
 
@@ -145,7 +142,6 @@ public class TTagTaskEntity {
 
         TTagTaskEntity that = (TTagTaskEntity) o;
 
-        if (groupId != that.groupId) return false;
         if (status != that.status) return false;
         if (updateTime != that.updateTime) return false;
         if (createTime != that.createTime) return false;
@@ -166,8 +162,7 @@ public class TTagTaskEntity {
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + groupId;
-        result = 31 * result + (int) status;
+        result = 31 * result + status;
         result = 31 * result + (jobId != null ? jobId.hashCode() : 0);
         result = 31 * result + (jobName != null ? jobName.hashCode() : 0);
         result = 31 * result + (tagList != null ? tagList.hashCode() : 0);
@@ -183,7 +178,6 @@ public class TTagTaskEntity {
     public TTagTaskEntity merge(TTagTaskEntity o) {
         if (null != o.getJobId()) this.jobId = o.getJobId();
         if (null != o.getJobName()) this.jobName = o.getJobName();
-        if (null != o.getGroupId()) this.groupId = o.getGroupId();
         if (null != o.getStatus()) this.status = o.getStatus();
         if (null != o.getTagList()) this.tagList = o.getTagList();
         if (null != o.getUpdateTime()) this.updateTime = o.getUpdateTime();
