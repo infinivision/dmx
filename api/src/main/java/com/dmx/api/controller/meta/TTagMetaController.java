@@ -23,7 +23,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping(value = "/tag")
-
 public class TTagMetaController {
     @Autowired
     TTagMetaRepository tTagMetaRepository;
@@ -40,18 +39,15 @@ public class TTagMetaController {
         if (item.isPresent()) {
             return new GetMessageResponse<TTagMetaEntity>(0, "", item.get());
         }
-
         return new GetMessageResponse<TTagMetaEntity>(-1, "has no record:" + tag_id, null);
     }
 
     @GetMapping("/is_name_exists")
     public MessageResponse getTagMetaEntityByName(@RequestParam("name") String name) {
         TTagMetaEntity item = tTagMetaRepository.findByName(name);
-
         if (null == item) {
             return new MessageResponse(0, "false");
         }
-
         return new MessageResponse(0, "true");
     }
 
@@ -60,19 +56,15 @@ public class TTagMetaController {
         if (check.hasErrors()) {
             return new MessageResponse(-1, check.getAllErrors().get(0).getDefaultMessage());
         }
-
         TTagMetaEntity item = tTagMetaRepository.findByName(tag_meta.getName());
         if (null != item) {
             return new MessageResponse(-1, "name:" + tag_meta.getName() + " is exists");
         }
-
         tag_meta.setCreateUserName("admin");
         tag_meta.setCreateGroupName("group");
         tag_meta.setPlatformId(1);
         tag_meta.setPlatformName("infinivision");
-
         tTagMetaRepository.save(tag_meta);
-
         return new MessageResponse(0, "");
     }
 
@@ -82,18 +74,13 @@ public class TTagMetaController {
         if (!item.isPresent()) {
             return new GetMessageResponse(-1, "id:" + tag_id + " is not exists", null);
         }
-
         TTagMetaEntity tag_meta = item.get();
-
         String name = tag_meta.getName() + "_copy";
-
         TTagMetaEntity item_by_name = tTagMetaRepository.findByName(name);
         if (null != item_by_name) {
             return new GetMessageResponse(-1, "name:" + name + " is exists", null);
         }
-
         TTagMetaEntity new_item = new TTagMetaEntity();
-
         new_item.setName(name);
         new_item.setRules(tag_meta.getRules());
         new_item.setCategory(tag_meta.getCategory());
@@ -106,12 +93,9 @@ public class TTagMetaController {
         new_item.setCreateGroupName(tag_meta.getCreateGroupName());
         new_item.setPlatformId(tag_meta.getPlatformId());
         new_item.setPlatformName(tag_meta.getPlatformName());
-
         tTagMetaRepository.save(new_item);
-
         Map<String, String> result = new HashMap<>();
         result.put("id", new_item.getId());
-
         return new GetMessageResponse(0, "", result);
     }
 
@@ -120,15 +104,12 @@ public class TTagMetaController {
         if (null == tag_id) {
             return new MessageResponse(-1, "id must not be null");
         }
-
         Optional<TTagMetaEntity> item = tTagMetaRepository.findById(tag_id);
         if (!item.isPresent()) {
             return new MessageResponse(0, "id:" + tag_id + " is not exists");
         }
-
-        tag_meta.setUpdateTime(new Long(System.currentTimeMillis()/1000).intValue());
+        tag_meta.setUpdateTime(new Long(System.currentTimeMillis() / 1000).intValue());
         tTagMetaRepository.save(item.get().merge(tag_meta));
-
         return new MessageResponse(0, "");
     }
 
@@ -137,14 +118,11 @@ public class TTagMetaController {
         if (null == tag_id) {
             return new MessageResponse(-1, "id must not be null");
         }
-
         Optional<TTagMetaEntity> item = tTagMetaRepository.findById(tag_id);
         if (!item.isPresent()) {
             return new MessageResponse(0, "id:" + tag_id + " is not exists");
         }
-
         tTagMetaRepository.deleteById(tag_id);
-
         return new MessageResponse(0, "");
     }
 
@@ -153,19 +131,14 @@ public class TTagMetaController {
                                                                   @RequestParam("size") Integer size,
                                                                   @RequestParam(value = "sort", required = false, defaultValue = "updateTime") String sort,
                                                                   @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
-
         if (!sort.equalsIgnoreCase("count") && !sort.equalsIgnoreCase("updateTime")) {
             return new GetListMessageResponse<TTagMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
         }
-
         if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
             return new GetListMessageResponse<TTagMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
         }
-
-        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
-
+        Pageable pageable = dir.equalsIgnoreCase("desc") ? PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))) : PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
         Page<TTagMetaEntity> page_list = tTagMetaRepository.findAll(pageable);
-
         return new GetListMessageResponse<TTagMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
     }
 
@@ -173,49 +146,41 @@ public class TTagMetaController {
     public GetListMessageResponse<TCustomerEntity> GetCustomersByTagId(@PathVariable("tag_id") String tag_id,
                                                                        @RequestParam("page") Integer page,
                                                                        @RequestParam("size") Integer size) {
-
         Optional<TTagMetaEntity> item = tTagMetaRepository.findById(tag_id);
         if (!item.isPresent()) {
             return new GetListMessageResponse<TCustomerEntity>(-1, "tag id:" + tag_id + " is not exists", page, size, new Long(0), null);
         }
-
         Pageable pageable = PageRequest.of(page, size, Sort.by("customer_id"));
-
-        Page<BigInteger> page_raw_customer_ids = tTagRepository.getTagCustomerIdsByTagId(tag_id, pageable);
-        int customer_size = page_raw_customer_ids.getContent().size();
+        String page_raw_customer_ids = tTagRepository.getTagCustomerIdsByTagId(tag_id, page, size);
+        long[] pageRawCustomerIds = Arrays.stream(page_raw_customer_ids.replace("{","").replace("}","").split(",")).mapToLong(s->Long.parseLong(s)).toArray();
+        int customer_size = pageRawCustomerIds.length;
         if (0 >= customer_size) {
             return new GetListMessageResponse<TCustomerEntity>(-1, "tag id:" + tag_id + " has no customers", page, size, new Long(0), null);
         }
-
         List<Long> customer_ids = new ArrayList<>();
-        for (int i = 0 ; i < customer_size; ++i) {
-            customer_ids.add(page_raw_customer_ids.getContent().get(i).longValue());
+        for (int i = 0; i < customer_size; ++i) {
+            customer_ids.add(pageRawCustomerIds[i]);
         }
-
         List<TCustomerEntity> customers = tCustomerRepository.findByIdInOrderById(customer_ids);
-
-        return new GetListMessageResponse<TCustomerEntity>(0, "", page, size, page_raw_customer_ids.getTotalElements(), customers);
+        Long count = tTagRepository.getTagCountById(tag_id);
+        return new GetListMessageResponse<TCustomerEntity>(0, "", page, size, count, customers);
     }
 
     @GetMapping("/query_by_category/{category_id}")
     public GetListMessageResponse<TTagMetaEntity> getTTagMetaListByCategory(
-                                                                    @PathVariable("category_id") String category_id,
-                                                                    @RequestParam("page") Integer page,
-                                                                    @RequestParam("size") Integer size,
-                                                                    @RequestParam(value = "sort", required = false, defaultValue = "updateTime") String sort,
-                                                                    @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
+            @PathVariable("category_id") String category_id,
+            @RequestParam("page") Integer page,
+            @RequestParam("size") Integer size,
+            @RequestParam(value = "sort", required = false, defaultValue = "updateTime") String sort,
+            @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
         if (!sort.equalsIgnoreCase("count") && !sort.equalsIgnoreCase("updateTime")) {
-            return new GetListMessageResponse<TTagMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
+            return new GetListMessageResponse<TTagMetaEntity>(-1,   "sort by " + sort + " is not support", page, size, new Long(0), null);
         }
-
         if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
             return new GetListMessageResponse<TTagMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
         }
-
-        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
-
+        Pageable pageable = dir.equalsIgnoreCase("desc") ? PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))) : PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
         Page<TTagMetaEntity> page_list = tTagMetaRepository.findByCategory(category_id, pageable);
-
         return new GetListMessageResponse<TTagMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
     }
 
@@ -229,15 +194,11 @@ public class TTagMetaController {
         if (!sort.equalsIgnoreCase("count") && !sort.equalsIgnoreCase("updateTime")) {
             return new GetListMessageResponse<TTagMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
         }
-
         if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
             return new GetListMessageResponse<TTagMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
         }
-
-        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
-
+        Pageable pageable = dir.equalsIgnoreCase("desc") ? PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))) : PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
         Page<TTagMetaEntity> page_list = tTagMetaRepository.findByNameContains(name, pageable);
-
         return new GetListMessageResponse<TTagMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
     }
 }

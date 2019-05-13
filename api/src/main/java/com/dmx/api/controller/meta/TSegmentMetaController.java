@@ -12,6 +12,8 @@ import com.dmx.api.entity.meta.TSegmentMetaEntity;
 import com.dmx.api.service.bean.SegmentRuleBean;
 import com.dmx.api.service.bean.SegmentRulesBean;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.stream.Stream;
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +31,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/segment")
-
 public class TSegmentMetaController {
     @Autowired
     TSegmentMetaRepository tSegmentMetaRepository;
@@ -46,18 +47,15 @@ public class TSegmentMetaController {
         if (item.isPresent()) {
             return new GetMessageResponse<TSegmentMetaEntity>(0, "", item.get());
         }
-
         return new GetMessageResponse<TSegmentMetaEntity>(-1, "has no record:" + segment_id, null);
     }
 
     @GetMapping("/is_name_exists")
     public MessageResponse getSegmentMetaEntityByName(@RequestParam("name") String name) {
         TSegmentMetaEntity item = tSegmentMetaRepository.findByName(name);
-
         if (null == item) {
             return new MessageResponse(0, "false");
         }
-
         return new MessageResponse(0, "true");
     }
 
@@ -66,30 +64,24 @@ public class TSegmentMetaController {
         if (check.hasErrors()) {
             return new MessageResponse(-1, check.getAllErrors().get(0).getDefaultMessage());
         }
-
         TSegmentMetaEntity item = tSegmentMetaRepository.findByName(segment_meta.getName());
         if (null != item) {
             return new MessageResponse(-1, "name:" + segment_meta.getName() + " is exists");
         }
-
         segment_meta.setCreateUserName("admin");
         segment_meta.setCreateGroupName("group");
         segment_meta.setPlatformId(1);
         segment_meta.setPlatformName("infinivision");
-
         tSegmentMetaRepository.save(segment_meta);
-
         if (null != segment_meta.getRules() && 0 < segment_meta.getRules().length()) {
             try {
                 ObjectMapper mapper = new ObjectMapper();
-                SegmentRulesBean rules_bean = mapper.readValue(segment_meta.getRules() , SegmentRulesBean.class);
-
+                SegmentRulesBean rules_bean = mapper.readValue(segment_meta.getRules(), SegmentRulesBean.class);
                 insertRules(segment_meta, rules_bean, System.currentTimeMillis());
             } catch (Exception e) {
                 return new MessageResponse(-1, "rules:" + segment_meta.getRules() + " is invalid");
             }
         }
-
         return new MessageResponse(0, "");
     }
 
@@ -99,18 +91,13 @@ public class TSegmentMetaController {
         if (!item.isPresent()) {
             return new GetMessageResponse(-1, "id:" + segment_id + " is not exists", null);
         }
-
         TSegmentMetaEntity segment_meta = item.get();
-
         String name = segment_meta.getName() + "_copy";
-
         TSegmentMetaEntity item_by_name = tSegmentMetaRepository.findByName(name);
         if (null != item_by_name) {
             return new GetMessageResponse(-1, "name:" + name + " is exists", null);
         }
-
         TSegmentMetaEntity new_item = new TSegmentMetaEntity();
-
         new_item.setName(name);
         new_item.setRules(segment_meta.getRules());
         new_item.setCategory(segment_meta.getCategory());
@@ -120,12 +107,9 @@ public class TSegmentMetaController {
         new_item.setCreateGroupName(segment_meta.getCreateGroupName());
         new_item.setPlatformId(segment_meta.getPlatformId());
         new_item.setPlatformName(segment_meta.getPlatformName());
-
         tSegmentMetaRepository.save(new_item);
-
         Map<String, String> result = new HashMap<>();
         result.put("id", new_item.getId());
-
         return new GetMessageResponse(0, "", result);
     }
 
@@ -134,31 +118,25 @@ public class TSegmentMetaController {
         if (null == segment_id) {
             return new MessageResponse(-1, "id must not be null");
         }
-
         Optional<TSegmentMetaEntity> item = tSegmentMetaRepository.findById(segment_id);
         if (!item.isPresent()) {
             return new MessageResponse(0, "id:" + segment_id + " is not exists");
         }
-
         segment_meta.setCreateUserName("admin");
         segment_meta.setCreateGroupName("group");
         segment_meta.setPlatformId(1);
         segment_meta.setPlatformName("infinivision");
         segment_meta.setUpdateTime(System.currentTimeMillis());
-
         tSegmentMetaRepository.save(item.get().merge(segment_meta));
-
         if (null != segment_meta.getRules() && 0 < segment_meta.getRules().length()) {
             try {
                 ObjectMapper mapper = new ObjectMapper();
-                SegmentRulesBean rules_bean = mapper.readValue(segment_meta.getRules() , SegmentRulesBean.class);
-
+                SegmentRulesBean rules_bean = mapper.readValue(segment_meta.getRules(), SegmentRulesBean.class);
                 updateRules(segment_meta, rules_bean, System.currentTimeMillis());
             } catch (Exception e) {
                 return new MessageResponse(-1, "rules:" + segment_meta.getRules() + " is invalid");
             }
         }
-
         return new MessageResponse(0, "");
     }
 
@@ -167,20 +145,15 @@ public class TSegmentMetaController {
         if (null == segment_id) {
             return new MessageResponse(-1, "id must not be null");
         }
-
         Optional<TSegmentMetaEntity> item = tSegmentMetaRepository.findById(segment_id);
         if (!item.isPresent()) {
             return new MessageResponse(0, "id:" + segment_id + " is not exists");
         }
-
         tSegmentMetaRepository.deleteById(segment_id);
-
         Optional<TTagEntity> tag_item = tTagRepository.findById(segment_id);
         if (tag_item.isPresent()) {
             tTagRepository.deleteById(segment_id);
         }
-
-
         return new MessageResponse(0, "");
     }
 
@@ -192,43 +165,33 @@ public class TSegmentMetaController {
         if (!sort.equalsIgnoreCase("customerCount") && !sort.equalsIgnoreCase("updateTime")) {
             return new GetListMessageResponse<TSegmentMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
         }
-
         if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
             return new GetListMessageResponse<TSegmentMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
         }
-
-        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
-
+        Pageable pageable = dir.equalsIgnoreCase("desc") ? PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))) : PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
         Page<TSegmentMetaEntity> page_list = tSegmentMetaRepository.findAll(pageable);
-
         return new GetListMessageResponse<TSegmentMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
     }
 
     @GetMapping("/{segment_id}/customers")
     public GetListMessageResponse<TCustomerEntity> GetCustomersBySegmentId(@PathVariable("segment_id") String segment_id,
-                                                                       @RequestParam("page") Integer page,
-                                                                       @RequestParam("size") Integer size) {
+                                                                           @RequestParam("page") Integer page,
+                                                                           @RequestParam("size") Integer size) {
         Optional<TSegmentMetaEntity> item = tSegmentMetaRepository.findById(segment_id);
         if (!item.isPresent()) {
             return new GetListMessageResponse<TCustomerEntity>(-1, "segment id:" + segment_id + " is not exists", page, size, new Long(0), null);
         }
-
         Pageable pageable = PageRequest.of(page, size, Sort.by("customer_id"));
-
-        Page<BigInteger> page_raw_customer_ids = tTagRepository.getTagCustomerIdsByTagId(segment_id, pageable);
-
-        int customer_size = page_raw_customer_ids.getContent().size();
+        String page_raw_customer_ids = tTagRepository.getTagCustomerIdsByTagId(segment_id, page, size);
+        long[] pageRawCustomerIds = Arrays.stream(page_raw_customer_ids.replace("{","").replace("}","").split(",")).mapToLong(s->Long.parseLong(s)).toArray();
+        Long count = tTagRepository.getTagCountById(segment_id);
+        int customer_size = pageRawCustomerIds.length;
         if (0 >= customer_size) {
             return new GetListMessageResponse<TCustomerEntity>(-1, "segment id:" + segment_id + " has no customers", page, size, new Long(0), null);
         }
-
-        List<Long> customer_ids = page_raw_customer_ids.stream()
-                .map(s -> s.longValue())
-                .collect(Collectors.toList());
-
+        List<Long> customer_ids = Arrays.asList(ArrayUtils.toObject(pageRawCustomerIds));
         List<TCustomerEntity> customers = tCustomerRepository.findByIdInOrderById(customer_ids);
-
-        return new GetListMessageResponse<TCustomerEntity>(0, "", page, size, page_raw_customer_ids.getTotalElements(), customers);
+        return new GetListMessageResponse<TCustomerEntity>(0, "", page, size, count, customers);
     }
 
     @GetMapping("/query_by_category/{category_id}")
@@ -241,15 +204,11 @@ public class TSegmentMetaController {
         if (!sort.equalsIgnoreCase("customerCount") && !sort.equalsIgnoreCase("updateTime")) {
             return new GetListMessageResponse<TSegmentMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
         }
-
         if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
             return new GetListMessageResponse<TSegmentMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
         }
-
-        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
-
+        Pageable pageable = dir.equalsIgnoreCase("desc") ? PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))) : PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
         Page<TSegmentMetaEntity> page_list = tSegmentMetaRepository.findByCategory(category_id, pageable);
-
         return new GetListMessageResponse<TSegmentMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
     }
 
@@ -263,15 +222,11 @@ public class TSegmentMetaController {
         if (!sort.equalsIgnoreCase("customerCount") && !sort.equalsIgnoreCase("updateTime")) {
             return new GetListMessageResponse<TSegmentMetaEntity>(-1, "sort by " + sort + " is not support", page, size, new Long(0), null);
         }
-
         if (!dir.equalsIgnoreCase("desc") && !dir.equalsIgnoreCase("asc")) {
             return new GetListMessageResponse<TSegmentMetaEntity>(-1, "directive by " + sort + " is not support", page, size, new Long(0), null);
         }
-
-        Pageable pageable = dir.equalsIgnoreCase("desc")?PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))):PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
-
+        Pageable pageable = dir.equalsIgnoreCase("desc") ? PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort))) : PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
         Page<TSegmentMetaEntity> page_list = tSegmentMetaRepository.findByNameContains(name, pageable);
-
         return new GetListMessageResponse<TSegmentMetaEntity>(0, "", page, size, page_list.getTotalElements(), page_list.getContent());
     }
 
@@ -314,8 +269,7 @@ public class TSegmentMetaController {
         if (0 >= rules.getRules().size()) {
             return;
         }
-
-        for (SegmentRuleBean item: rules.getRules()) {
+        for (SegmentRuleBean item : rules.getRules()) {
             addRule(segment_meta, rules.getLogic(), item, now);
         }
     }
@@ -324,11 +278,8 @@ public class TSegmentMetaController {
         if (0 >= rules.getRules().size()) {
             return;
         }
-
         insertRule(segment_meta, rules.getRules().get(0), now);
-
         rules.getRules().remove(0);
-
         addRules(segment_meta, rules, now);
     }
 
@@ -336,11 +287,8 @@ public class TSegmentMetaController {
         if (0 >= rules.getRules().size()) {
             return;
         }
-
         updateRule(segment_meta, rules.getRules().get(0), now);
-
         rules.getRules().remove(0);
-
         addRules(segment_meta, rules, now);
     }
 }
